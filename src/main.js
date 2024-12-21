@@ -1,8 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
 import './style.css'
-import javascriptLogo from './javascript.svg'
-import viteLogo from '/vite.svg'
-import { setupCounter } from './counter.js'
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://vjaolwcexcjblstbsyoj.supabase.co'
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqYW9sd2NleGNqYmxzdGJzeW9qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ2NDQ3OTAsImV4cCI6MjA1MDIyMDc5MH0.ITA8YP8f1Yj_MJuyqr6GjFYGmhpnM5x5LGpw4sfbDJw'
@@ -19,12 +16,45 @@ function generateUUID() {
     })
 }
 
+// Sign in with email
+async function signInWithEmail() {
+    try {
+        console.log('Attempting to sign in...')
+        const { data: { session }, error } = await supabase.auth.getSession()
+        
+        if (error) throw error
+        
+        if (!session) {
+            // If no session, sign in with anonymous account
+            const { data, error: signInError } = await supabase.auth.signInWithPassword({
+                email: 'test@example.com',
+                password: 'test123456'
+            })
+            
+            if (signInError) {
+                // If sign in fails, try to sign up
+                const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+                    email: 'test@example.com',
+                    password: 'test123456'
+                })
+                
+                if (signUpError) throw signUpError
+            }
+        }
+        
+        return true
+    } catch (error) {
+        console.error('Authentication error:', error)
+        return false
+    }
+}
+
 // Prefill form data
 const prefillData = {
     id: generateUUID(),
     destination: 'Paris',
     country: 'France',
-    flag: '🇫🇷',
+    flag: '',
     image_url: 'https://example.com/image65.jpg',
     price: 199,
     original_price: 751,
@@ -132,7 +162,7 @@ async function displayDeals() {
 }
 
 // Function to initialize form
-function initializeForm() {
+async function initializeForm() {
     console.log('Initializing form...')
     const form = document.getElementById('dealForm')
     if (!form) {
@@ -140,9 +170,13 @@ function initializeForm() {
         return
     }
 
+    // Ensure we're authenticated before setting up the form
+    await signInWithEmail()
+
     form.addEventListener('submit', async (e) => {
         e.preventDefault()
         console.log('Form submission started')
+        form.classList.add('loading')
 
         try {
             const formData = new FormData(e.target)
@@ -185,25 +219,15 @@ function initializeForm() {
         } catch (error) {
             console.error('Error submitting deal:', error)
             alert('Error submitting deal: ' + error.message)
+        } finally {
+            form.classList.remove('loading')
         }
     })
 }
 
 document.querySelector('#app').innerHTML = `
   <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="${viteLogo}" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">
-      <img src="${javascriptLogo}" class="logo vanilla" alt="JavaScript logo" />
-    </a>
     <h1>Hello Vite!</h1>
-    <div class="card">
-      <button id="counter" type="button"></button>
-    </div>
-    <p class="read-the-docs">
-      Click on the Vite logo to learn more
-    </p>
     <form id="dealForm">
         <label for="destination">Destination:</label>
         <input type="text" id="destination" name="destination"><br><br>
@@ -253,19 +277,17 @@ document.querySelector('#app').innerHTML = `
   </div>
 `
 
-setupCounter(document.querySelector('#counter'))
-
 // Initialize everything when DOM is loaded
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
         console.log('DOM Content Loaded')
+        await initializeForm()
         prefillForm()
-        initializeForm()
         displayDeals()
     })
 } else {
     console.log('DOM already loaded')
-    prefillForm()
     initializeForm()
+    prefillForm()
     displayDeals()
 }
