@@ -226,53 +226,130 @@ async function initializeForm() {
 }
 
 document.querySelector('#app').innerHTML = `
-  <div>
-    <h1>Hello Vite!</h1>
-    <form id="dealForm">
-        <label for="destination">Destination:</label>
-        <input type="text" id="destination" name="destination"><br><br>
-        <label for="country">Country:</label>
-        <input type="text" id="country" name="country"><br><br>
-        <label for="flag">Flag:</label>
-        <input type="text" id="flag" name="flag"><br><br>
-        <label for="image_url">Image URL:</label>
-        <input type="text" id="image_url" name="image_url"><br><br>
-        <label for="price">Price:</label>
-        <input type="number" id="price" name="price"><br><br>
-        <label for="original_price">Original Price:</label>
-        <input type="number" id="original_price" name="original_price"><br><br>
-        <label for="discount">Discount:</label>
-        <input type="number" id="discount" name="discount"><br><br>
-        <label for="departure">Departure:</label>
-        <input type="text" id="departure" name="departure"><br><br>
-        <label for="stops">Stops:</label>
-        <input type="text" id="stops" name="stops"><br><br>
-        <label for="is_hot">Is Hot:</label>
-        <input type="checkbox" id="is_hot" name="is_hot"><br><br>
-        <label for="type">Type:</label>
-        <select id="type" name="type">
+  <div class="container">
+    <h1>Add New Travel Deal</h1>
+    <form id="dealForm" class="form-container">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="id">ID (auto-generated):</label>
+          <input type="text" id="id" name="id" readonly>
+        </div>
+        
+        <div class="form-group">
+          <label for="destination">Destination:</label>
+          <input type="text" id="destination" name="destination" required>
+        </div>
+
+        <div class="form-group">
+          <label for="country">Country:</label>
+          <input type="text" id="country" name="country" required>
+        </div>
+
+        <div class="form-group">
+          <label for="flag">Flag:</label>
+          <input type="text" id="flag" name="flag" placeholder="e.g. ">
+        </div>
+
+        <div class="form-group">
+          <label for="departure">Departure:</label>
+          <input type="text" id="departure" name="departure" required>
+        </div>
+
+        <div class="form-group">
+          <label for="stops">Stops:</label>
+          <select id="stops" name="stops" required>
+            <option value="Non-stop">Non-stop</option>
+            <option value="1 Stop">1 Stop</option>
+            <option value="2+ Stops">2+ Stops</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="type">Cabin Type:</label>
+          <select id="type" name="type" required>
             <option value="Economy">Economy</option>
+            <option value="Premium Economy">Premium Economy</option>
             <option value="Business">Business</option>
-            <option value="First Class">First Class</option>
-        </select><br><br>
-        <label for="likes">Likes:</label>
-        <input type="number" id="likes" name="likes"><br><br>
-        <label for="url">URL:</label>
-        <input type="text" id="url" name="url"><br><br>
-        <label for="departure_time">Departure Time:</label>
-        <input type="text" id="departure_time" name="departure_time"><br><br>
-        <label for="arrival_time">Arrival Time:</label>
-        <input type="text" id="arrival_time" name="arrival_time"><br><br>
-        <label for="flight_duration">Flight Duration:</label>
-        <input type="text" id="flight_duration" name="flight_duration"><br><br>
-        <label for="posted_by">Posted By:</label>
-        <input type="text" id="posted_by" name="posted_by"><br><br>
-        <label for="posted_by_avatar">Posted By Avatar:</label>
-        <input type="text" id="posted_by_avatar" name="posted_by_avatar"><br><br>
-        <label for="posted_by_description">Posted By Description:</label>
-        <input type="text" id="posted_by_description" name="posted_by_description"><br><br>
-        <input type="submit" value="Submit">
+            <option value="First">First</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="price">Price ($):</label>
+          <input type="number" id="price" name="price" required>
+        </div>
+
+        <div class="form-group">
+          <label for="original_price">Original Price ($):</label>
+          <input type="number" id="original_price" name="original_price" required>
+        </div>
+
+        <div class="form-group">
+          <label for="discount">Discount ($):</label>
+          <input type="number" id="discount" name="discount" required>
+        </div>
+
+        <div class="form-group">
+          <label for="departure_time">Departure Time:</label>
+          <input type="text" id="departure_time" name="departure_time" placeholder="e.g. 08:00">
+        </div>
+
+        <div class="form-group">
+          <label for="arrival_time">Arrival Time:</label>
+          <input type="text" id="arrival_time" name="arrival_time" placeholder="e.g. 12:00">
+        </div>
+
+        <div class="form-group">
+          <label for="flight_duration">Flight Duration:</label>
+          <input type="text" id="flight_duration" name="flight_duration" placeholder="e.g. 5h 30m">
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="image_url">Image URL:</label>
+          <input type="url" id="image_url" name="image_url">
+        </div>
+
+        <div class="form-group">
+          <label for="url">Deal URL:</label>
+          <input type="url" id="url" name="url">
+        </div>
+
+        <div class="form-group">
+          <label for="likes">Likes:</label>
+          <input type="number" id="likes" name="likes">
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="posted_by">Posted By:</label>
+          <input type="text" id="posted_by" name="posted_by">
+        </div>
+
+        <div class="form-group">
+          <label for="posted_by_avatar">Posted By Avatar:</label>
+          <input type="url" id="posted_by_avatar" name="posted_by_avatar">
+        </div>
+
+        <div class="form-group">
+          <label for="posted_by_description">Posted By Description:</label>
+          <input type="text" id="posted_by_description" name="posted_by_description">
+        </div>
+      </div>
+
+      <div class="form-group checkbox-group">
+        <label>
+          <input type="checkbox" id="is_hot" name="is_hot">
+          Hot Deal
+        </label>
+      </div>
+
+      <button type="submit">Submit Deal</button>
     </form>
+
+    <h2>Recent Deals</h2>
     <div id="dealsList"></div>
   </div>
 `
