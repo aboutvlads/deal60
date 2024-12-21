@@ -4,10 +4,11 @@ import './style.css'
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://vjaolwcexcjblstbsyoj.supabase.co'
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqYW9sd2NleGNqYmxzdGJzeW9qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ2NDQ3OTAsImV4cCI6MjA1MDIyMDc5MH0.ITA8YP8f1Yj_MJuyqr6GjFYGmhpnM5x5LGpw4sfbDJw'
 
-// Initialize Supabase client
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-// Function to generate UUID
+let isEditing = false;
+let editingId = null;
+
 function generateUUID() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         const r = Math.random() * 16 | 0
@@ -16,32 +17,23 @@ function generateUUID() {
     })
 }
 
-// Sign in with email
 async function signInWithEmail() {
     try {
-        console.log('Attempting to sign in...')
         const { data: { session }, error } = await supabase.auth.getSession()
-        
         if (error) throw error
-        
         if (!session) {
-            // If no session, sign in with anonymous account
             const { data, error: signInError } = await supabase.auth.signInWithPassword({
                 email: 'test@example.com',
                 password: 'test123456'
             })
-            
             if (signInError) {
-                // If sign in fails, try to sign up
                 const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
                     email: 'test@example.com',
                     password: 'test123456'
                 })
-                
                 if (signUpError) throw signUpError
             }
         }
-        
         return true
     } catch (error) {
         console.error('Authentication error:', error)
@@ -49,139 +41,182 @@ async function signInWithEmail() {
     }
 }
 
-// Prefill form data
 const prefillData = {
     id: generateUUID(),
     destination: 'Paris',
     country: 'France',
-    flag: '',
-    image_url: 'https://example.com/image65.jpg',
-    price: 199,
-    original_price: 751,
-    discount: 104,
+    flag: '🇫🇷',
+    image_url: 'https://example.com/paris.jpg',
+    price: 499,
+    original_price: 899,
+    discount: 400,
     departure: 'New York',
     stops: 'Non-stop',
     is_hot: true,
     type: 'Economy',
-    likes: 735,
-    url: 'https://example.com/deal35',
+    likes: 0,
+    url: 'https://example.com/paris-deal',
     departure_time: '08:00',
-    arrival_time: '12:00',
-    flight_duration: '5h 30m',
-    posted_by: 'Admin',
-    posted_by_avatar: 'https://example.com/avatar21.jpg',
-    posted_by_description: 'Luxury seeker'
+    arrival_time: '20:00',
+    flight_duration: '12h 00m',
+    posted_by: 'System',
+    posted_by_avatar: 'https://example.com/avatar.jpg',
+    posted_by_description: 'Deal Hunter'
 }
 
-// Function to prefill the form
-function prefillForm() {
-    console.log('Prefilling form...')
+function prefillForm(data = prefillData) {
     const form = document.getElementById('dealForm')
-    if (!form) {
-        console.error('Form not found!')
-        return
+    if (!form) return
+
+    const formData = { ...data }
+    if (!isEditing) {
+        formData.id = generateUUID()
     }
 
-    const newUUID = generateUUID()
-    console.log('Generated UUID:', newUUID)
-
-    Object.entries({ ...prefillData, id: newUUID }).forEach(([key, value]) => {
+    Object.entries(formData).forEach(([key, value]) => {
         const input = form.elements[key]
         if (input) {
             if (input.type === 'checkbox') {
                 input.checked = value
-            } else if (input.type === 'select-one') {
-                const option = Array.from(input.options).find(opt => opt.value === value)
-                if (option) {
-                    option.selected = true
-                }
             } else {
                 input.value = value
             }
-            console.log(`Set ${key} to ${value}`)
-        } else {
-            console.warn(`Input for ${key} not found`)
         }
     })
-    console.log('Form prefilled successfully')
+
+    const submitButton = form.querySelector('button[type="submit"]')
+    if (submitButton) {
+        submitButton.textContent = isEditing ? 'Update Deal' : 'Add Deal'
+    }
 }
 
-// Function to display deals
+function formatDate(dateString) {
+    const options = { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric',
+        hour: '2-digit', 
+        minute: '2-digit'
+    }
+    return new Date(dateString).toLocaleDateString('en-US', options)
+}
+
+function formatPrice(price) {
+    return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+    }).format(price)
+}
+
 async function displayDeals() {
     try {
-        console.log('Fetching deals...')
         const { data, error } = await supabase
             .from('deals')
             .select('*')
             .order('created_at', { ascending: false })
-            .limit(5)
+            .limit(10)
 
         if (error) throw error
 
-        console.log('Deals fetched:', data)
-
         const dealsList = document.getElementById('dealsList')
-        if (!dealsList) {
-            console.error('Deals list element not found!')
-            return
-        }
+        if (!dealsList) return
 
-        dealsList.innerHTML = ''
-        
-        if (!data || data.length === 0) {
-            dealsList.innerHTML = '<p>No deals found</p>'
-            return
-        }
-        
-        data.forEach(deal => {
-            const div = document.createElement('div')
-            div.className = 'deal-item'
-            div.innerHTML = `
-                <div>
-                    <strong>${deal.destination}, ${deal.country}</strong> ${deal.flag}<br>
-                    Stops: ${deal.stops}<br>
-                    Type: ${deal.type}
-                </div>
-                <div>
-                    <strong>Price:</strong> $${deal.price} (Save $${deal.discount})<br>
-                    <strong>Departure:</strong> ${deal.departure}<br>
-                    <strong>Duration:</strong> ${deal.flight_duration}
-                </div>
-                <div>
-                    <strong>Posted by:</strong> ${deal.posted_by}<br>
-                    <strong>Likes:</strong> ${deal.likes}<br>
-                    <a href="${deal.url}" target="_blank">View Deal</a>
-                </div>
-            `
-            dealsList.appendChild(div)
-        })
-        console.log('Deals displayed successfully')
+        dealsList.innerHTML = `
+            <div class="deals-table-container">
+                <table class="deals-table">
+                    <thead>
+                        <tr>
+                            <th>Destination</th>
+                            <th>Price</th>
+                            <th>Departure</th>
+                            <th>Type</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.map(deal => `
+                            <tr>
+                                <td>${deal.destination} ${deal.flag || ''}</td>
+                                <td>
+                                    <div class="price-info">
+                                        <span class="current-price">${formatPrice(deal.price)}</span>
+                                        <span class="original-price">${formatPrice(deal.original_price)}</span>
+                                    </div>
+                                </td>
+                                <td>${deal.departure}</td>
+                                <td>${deal.type}</td>
+                                <td>${formatDate(deal.created_at)}</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button onclick="window.editDeal('${deal.id}')" class="edit-btn">Edit</button>
+                                        <button onclick="window.deleteDeal('${deal.id}')" class="delete-btn">Delete</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `
     } catch (error) {
-        console.error('Error in displayDeals:', error)
+        console.error('Error displaying deals:', error)
     }
 }
 
-// Function to initialize form
-async function initializeForm() {
-    console.log('Initializing form...')
-    const form = document.getElementById('dealForm')
-    if (!form) {
-        console.error('Form not found during initialization')
-        return
-    }
+async function editDeal(id) {
+    try {
+        const { data, error } = await supabase
+            .from('deals')
+            .select('*')
+            .eq('id', id)
+            .single()
 
-    // Ensure we're authenticated before setting up the form
+        if (error) throw error
+
+        isEditing = true
+        editingId = id
+        prefillForm(data)
+        document.getElementById('dealForm').scrollIntoView({ behavior: 'smooth' })
+    } catch (error) {
+        console.error('Error editing deal:', error)
+        alert('Error editing deal: ' + error.message)
+    }
+}
+
+async function deleteDeal(id) {
+    if (!confirm('Are you sure you want to delete this deal?')) return
+
+    try {
+        const { error } = await supabase
+            .from('deals')
+            .delete()
+            .eq('id', id)
+
+        if (error) throw error
+
+        await displayDeals()
+        alert('Deal deleted successfully!')
+    } catch (error) {
+        console.error('Error deleting deal:', error)
+        alert('Error deleting deal: ' + error.message)
+    }
+}
+
+async function initializeForm() {
+    const form = document.getElementById('dealForm')
+    if (!form) return
+
     await signInWithEmail()
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault()
-        console.log('Form submission started')
         form.classList.add('loading')
 
         try {
             const formData = new FormData(e.target)
             const data = {
-                id: formData.get('id') || generateUUID(),
+                id: formData.get('id'),
                 destination: formData.get('destination'),
                 country: formData.get('country'),
                 flag: formData.get('flag'),
@@ -194,7 +229,6 @@ async function initializeForm() {
                 is_hot: formData.get('is_hot') === 'on',
                 type: formData.get('type'),
                 likes: parseInt(formData.get('likes')) || 0,
-                created_at: new Date().toISOString(),
                 url: formData.get('url'),
                 departure_time: formData.get('departure_time'),
                 arrival_time: formData.get('arrival_time'),
@@ -204,16 +238,23 @@ async function initializeForm() {
                 posted_by_description: formData.get('posted_by_description')
             }
 
-            console.log('Submitting data:', data)
-
-            const { error } = await supabase
-                .from('deals')
-                .insert([data])
+            let error;
+            if (isEditing) {
+                ({ error } = await supabase
+                    .from('deals')
+                    .update(data)
+                    .eq('id', editingId))
+            } else {
+                ({ error } = await supabase
+                    .from('deals')
+                    .insert([data]))
+            }
 
             if (error) throw error
 
-            console.log('Deal submitted successfully')
-            alert('Deal submitted successfully!')
+            alert(isEditing ? 'Deal updated successfully!' : 'Deal added successfully!')
+            isEditing = false
+            editingId = null
             prefillForm()
             displayDeals()
         } catch (error) {
@@ -225,9 +266,13 @@ async function initializeForm() {
     })
 }
 
+// Make functions available globally for onclick handlers
+window.editDeal = editDeal;
+window.deleteDeal = deleteDeal;
+
 document.querySelector('#app').innerHTML = `
   <div class="container">
-    <h1>Add New Travel Deal</h1>
+    <h1>Travel Deals Manager</h1>
     <form id="dealForm" class="form-container">
       <div class="form-grid">
         <div class="form-group">
@@ -247,7 +292,7 @@ document.querySelector('#app').innerHTML = `
 
         <div class="form-group">
           <label for="flag">Flag:</label>
-          <input type="text" id="flag" name="flag" placeholder="e.g. ">
+          <input type="text" id="flag" name="flag" placeholder="e.g. 🇫🇷">
         </div>
 
         <div class="form-group">
@@ -346,7 +391,7 @@ document.querySelector('#app').innerHTML = `
         </label>
       </div>
 
-      <button type="submit">Submit Deal</button>
+      <button type="submit">Add Deal</button>
     </form>
 
     <h2>Recent Deals</h2>
@@ -354,16 +399,13 @@ document.querySelector('#app').innerHTML = `
   </div>
 `
 
-// Initialize everything when DOM is loaded
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', async () => {
-        console.log('DOM Content Loaded')
         await initializeForm()
         prefillForm()
         displayDeals()
     })
 } else {
-    console.log('DOM already loaded')
     initializeForm()
     prefillForm()
     displayDeals()
