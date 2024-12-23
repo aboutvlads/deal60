@@ -281,27 +281,27 @@ document.querySelector('#app').innerHTML = `
         </div>
         
         <div class="form-group">
-          <label for="departure">From:</label>
-          <input type="text" id="departure" name="departure" required>
-        </div>
-
-        <div class="form-group">
-          <label for="destination">To:</label>
+          <label for="destination">Destination:</label>
           <input type="text" id="destination" name="destination" required>
         </div>
 
         <div class="form-group">
-          <label for="country">To (country):</label>
+          <label for="country">Country:</label>
           <input type="text" id="country" name="country" required>
         </div>
 
         <div class="form-group">
-          <label for="flag">To (country emoji):</label>
+          <label for="flag">Flag:</label>
           <input type="text" id="flag" name="flag" placeholder="e.g. 🇫🇷">
         </div>
 
         <div class="form-group">
-          <label for="stops">Travel Dates • Stops:</label>
+          <label for="departure">Departure:</label>
+          <input type="text" id="departure" name="departure" required>
+        </div>
+
+        <div class="form-group">
+          <label for="stops">Stops:</label>
           <select id="stops" name="stops" required>
             <option value="Non-stop">Non-stop</option>
             <option value="1 Stop">1 Stop</option>
@@ -320,12 +320,12 @@ document.querySelector('#app').innerHTML = `
         </div>
 
         <div class="form-group">
-          <label for="price">Discount price ($):</label>
+          <label for="price">Price ($):</label>
           <input type="number" id="price" name="price" required>
         </div>
 
         <div class="form-group">
-          <label for="original_price">Original price ($):</label>
+          <label for="original_price">Original Price ($):</label>
           <input type="number" id="original_price" name="original_price" required>
         </div>
 
@@ -357,8 +357,13 @@ document.querySelector('#app').innerHTML = `
         </div>
 
         <div class="form-group">
-          <label for="url">URL:</label>
+          <label for="url">Deal URL:</label>
           <input type="url" id="url" name="url">
+        </div>
+
+        <div class="form-group">
+          <label for="likes">Likes:</label>
+          <input type="number" id="likes" name="likes">
         </div>
       </div>
 
@@ -382,7 +387,7 @@ document.querySelector('#app').innerHTML = `
       <div class="form-group checkbox-group">
         <label>
           <input type="checkbox" id="is_hot" name="is_hot">
-          Is HOT DEAL?
+          Hot Deal
         </label>
       </div>
 
