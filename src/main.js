@@ -314,6 +314,9 @@ async function initializeForm() {
 
         try {
             const formData = new FormData(e.target)
+            const price = parseInt(formData.get('price'))
+            const originalPrice = parseInt(formData.get('original_price'))
+            
             const data = {
                 id: formData.get('id'),
                 departure: formData.get('departure'),
@@ -321,8 +324,9 @@ async function initializeForm() {
                 country: formData.get('country'),
                 flag: formData.get('flag'),
                 stops: formData.get('stops'),
-                price: parseInt(formData.get('price')),
-                original_price: parseInt(formData.get('original_price')),
+                price: price,
+                original_price: originalPrice,
+                discount: originalPrice - price, // Calculate discount automatically
                 posted_by: formData.get('posted_by'),
                 posted_by_avatar: formData.get('posted_by_avatar'),
                 posted_by_description: formData.get('posted_by_description'),
