@@ -293,13 +293,114 @@ const countryEmojis = {
     "Uzbekistan": "🇺🇿", "Venezuela": "🇻🇪", "Vietnam": "🇻🇳", "Yemen": "🇾🇪"
 };
 
+const cityToCountry = {
+    // Europe
+    "Paris": "France",
+    "London": "United Kingdom",
+    "Rome": "Italy",
+    "Madrid": "Spain",
+    "Berlin": "Germany",
+    "Amsterdam": "Netherlands",
+    "Brussels": "Belgium",
+    "Vienna": "Austria",
+    "Prague": "Czech Republic",
+    "Copenhagen": "Denmark",
+    "Stockholm": "Sweden",
+    "Oslo": "Norway",
+    "Helsinki": "Finland",
+    "Dublin": "Ireland",
+    "Athens": "Greece",
+    "Warsaw": "Poland",
+    "Budapest": "Hungary",
+    "Lisbon": "Portugal",
+    "Barcelona": "Spain",
+    "Munich": "Germany",
+    "Milan": "Italy",
+    "Frankfurt": "Germany",
+    "Zurich": "Switzerland",
+    "Geneva": "Switzerland",
+    
+    // North America
+    "New York": "United States",
+    "Los Angeles": "United States",
+    "Chicago": "United States",
+    "Toronto": "Canada",
+    "Vancouver": "Canada",
+    "Montreal": "Canada",
+    "Mexico City": "Mexico",
+    "Miami": "United States",
+    "Las Vegas": "United States",
+    "San Francisco": "United States",
+    
+    // Asia
+    "Tokyo": "Japan",
+    "Seoul": "South Korea",
+    "Beijing": "China",
+    "Shanghai": "China",
+    "Hong Kong": "China",
+    "Singapore": "Singapore",
+    "Bangkok": "Thailand",
+    "Dubai": "United Arab Emirates",
+    "Mumbai": "India",
+    "Delhi": "India",
+    "Istanbul": "Turkey",
+    
+    // Australia & Oceania
+    "Sydney": "Australia",
+    "Melbourne": "Australia",
+    "Brisbane": "Australia",
+    "Auckland": "New Zealand",
+    "Wellington": "New Zealand",
+    
+    // South America
+    "Rio de Janeiro": "Brazil",
+    "Sao Paulo": "Brazil",
+    "Buenos Aires": "Argentina",
+    "Lima": "Peru",
+    "Santiago": "Chile",
+    
+    // Africa
+    "Cairo": "Egypt",
+    "Cape Town": "South Africa",
+    "Johannesburg": "South Africa",
+    "Nairobi": "Kenya",
+    "Marrakech": "Morocco",
+    "Casablanca": "Morocco"
+};
+
 function updateFlag() {
     const countryInput = document.getElementById('country');
     const flagInput = document.getElementById('flag');
-    const selectedCountry = countryInput.value;
-    const flag = countryEmojis[selectedCountry];
-    if (flag) {
-        flagInput.value = flag;
+    const inputCountry = countryInput.value.trim();
+    
+    // Try exact match first
+    let flag = countryEmojis[inputCountry];
+    
+    // If no exact match, try case-insensitive match
+    if (!flag) {
+        const countryKey = Object.keys(countryEmojis).find(
+            country => country.toLowerCase() === inputCountry.toLowerCase()
+        );
+        if (countryKey) {
+            flag = countryEmojis[countryKey];
+            // Update the input to the correct case
+            countryInput.value = countryKey;
+        }
+    }
+    
+    // Update the flag input
+    flagInput.value = flag || '🏳️';
+}
+
+function updateCountryFromCity() {
+    const cityInput = document.getElementById('destination');
+    const countryInput = document.getElementById('country');
+    const city = cityInput.value.trim();
+    const country = cityToCountry[city];
+    
+    if (country) {
+        countryInput.value = country;
+        updateFlag(); // This will update the flag based on the new country value
     }
 }
 
@@ -318,12 +419,15 @@ document.querySelector('#app').innerHTML = `
 
         <div class="form-group">
           <label for="destination">To:</label>
-          <input type="text" id="destination" name="destination" required>
+          <input type="text" id="destination" name="destination" list="cityList" onchange="updateCountryFromCity()" required>
+          <datalist id="cityList">
+            ${Object.keys(cityToCountry).map(city => `<option value="${city}">`).join('')}
+          </datalist>
         </div>
 
         <div class="form-group">
           <label for="country">To (country):</label>
-          <input type="text" id="country" name="country" list="countryList" onchange="updateFlag()" required>
+          <input type="text" id="country" name="country" list="countryList" oninput="updateFlag()" onchange="updateFlag()" required>
           <datalist id="countryList">
             ${Object.keys(countryEmojis).map(country => `<option value="${country}">`).join('')}
           </datalist>
