@@ -147,7 +147,8 @@ const prefillData = {
     destination: 'Paris',
     country: 'France',
     flag: '🇫🇷',
-    stops: 'Non-stop',
+    travel_period: 'May-Jun',
+    travel_stops: 'Direct',
     price: 499,
     original_price: 899,
     discount: 400,
@@ -170,6 +171,13 @@ function prefillForm(data = prefillData) {
     const formData = { ...data }
     if (!isEditing) {
         formData.id = generateUUID()
+    }
+
+    // If we're editing and have a combined stops value, split it
+    if (isEditing && formData.stops) {
+        const [period, stops] = formData.stops.split(' • ');
+        formData.travel_period = period;
+        formData.travel_stops = stops;
     }
 
     Object.entries(formData).forEach(([key, value]) => {
@@ -316,13 +324,17 @@ async function initializeForm() {
 
         try {
             const formData = new FormData(e.target)
+            const travelPeriod = formData.get('travel_period')
+            const travelStops = formData.get('travel_stops')
+            const combinedStops = `${travelPeriod} • ${travelStops}`
+
             const data = {
                 id: formData.get('id'),
                 departure: formData.get('departure'),
                 destination: formData.get('destination'),
                 country: formData.get('country'),
                 flag: formData.get('flag'),
-                stops: formData.get('stops'),
+                stops: combinedStops,
                 price: parseInt(formData.get('price')),
                 original_price: parseInt(formData.get('original_price')),
                 discount: parseInt(formData.get('discount')),
@@ -399,8 +411,13 @@ document.querySelector('#app').innerHTML = `
         </div>
 
         <div class="form-group">
-          <label for="stops">Travel Dates • Stops:</label>
-          <input type="text" id="stops" name="stops" placeholder="e.g. Jan 15-22 • Non-stop" required>
+          <label for="travel_period">Travel period:</label>
+          <input type="text" id="travel_period" name="travel_period" placeholder="e.g. May-Jun" required>
+        </div>
+
+        <div class="form-group">
+          <label for="travel_stops">Stops:</label>
+          <input type="text" id="travel_stops" name="travel_stops" placeholder="e.g. Direct" required>
         </div>
 
         <div class="form-group">
