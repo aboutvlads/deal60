@@ -9,6 +9,46 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 let isEditing = false;
 let editingId = null;
 
+const countryEmojis = {
+    "🇺🇸 USA": "🇺🇸",
+    "🇬🇧 UK": "🇬🇧",
+    "🇫🇷 France": "🇫🇷",
+    "🇩🇪 Germany": "🇩🇪",
+    "🇮🇹 Italy": "🇮🇹",
+    "🇪🇸 Spain": "🇪🇸",
+    "🇵🇹 Portugal": "🇵🇹",
+    "🇳🇱 Netherlands": "🇳🇱",
+    "🇧🇪 Belgium": "🇧🇪",
+    "🇨🇭 Switzerland": "🇨🇭",
+    "🇦🇹 Austria": "🇦🇹",
+    "🇸🇪 Sweden": "🇸🇪",
+    "🇳🇴 Norway": "🇳🇴",
+    "🇩🇰 Denmark": "🇩🇰",
+    "🇫🇮 Finland": "🇫🇮",
+    "🇮🇪 Ireland": "🇮🇪",
+    "🇬🇷 Greece": "🇬🇷",
+    "🇹🇷 Turkey": "🇹🇷",
+    "🇦🇪 UAE": "🇦🇪",
+    "🇯🇵 Japan": "🇯🇵",
+    "🇰🇷 South Korea": "🇰🇷",
+    "🇨🇳 China": "🇨🇳",
+    "🇭🇰 Hong Kong": "🇭🇰",
+    "🇸🇬 Singapore": "🇸🇬",
+    "🇹🇭 Thailand": "🇹🇭",
+    "🇻🇳 Vietnam": "🇻🇳",
+    "🇮🇳 India": "🇮🇳",
+    "🇦🇺 Australia": "🇦🇺",
+    "🇳🇿 New Zealand": "🇳🇿",
+    "🇨🇦 Canada": "🇨🇦",
+    "🇲🇽 Mexico": "🇲🇽",
+    "🇧🇷 Brazil": "🇧🇷",
+    "🇦🇷 Argentina": "🇦🇷",
+    "🇨🇱 Chile": "🇨🇱",
+    "🇿🇦 South Africa": "🇿🇦",
+    "🇪🇬 Egypt": "🇪🇬",
+    "🇲🇦 Morocco": "🇲🇦"
+};
+
 function generateUUID() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         const r = Math.random() * 16 | 0
@@ -50,7 +90,6 @@ const prefillData = {
     stops: 'Non-stop',
     price: 499,
     original_price: 899,
-    discount: 400,
     posted_by: 'System',
     posted_by_avatar: 'https://example.com/avatar.jpg',
     posted_by_description: 'Deal Hunter',
@@ -224,7 +263,6 @@ async function initializeForm() {
                 stops: formData.get('stops'),
                 price: parseInt(formData.get('price')),
                 original_price: parseInt(formData.get('original_price')),
-                discount: parseInt(formData.get('discount')),
                 posted_by: formData.get('posted_by'),
                 posted_by_avatar: formData.get('posted_by_avatar'),
                 posted_by_description: formData.get('posted_by_description'),
@@ -294,7 +332,12 @@ document.querySelector('#app').innerHTML = `
 
         <div class="form-group">
           <label for="flag">To (country emoji):</label>
-          <input type="text" id="flag" name="flag" placeholder="e.g. 🇫🇷">
+          <input type="text" id="flag" name="flag" list="country-emojis" placeholder="Click to select country flag">
+          <datalist id="country-emojis">
+            ${Object.entries(countryEmojis).map(([label, emoji]) => `
+              <option value="${emoji}">${label}</option>
+            `).join('')}
+          </datalist>
         </div>
 
         <div class="form-group">
@@ -303,18 +346,13 @@ document.querySelector('#app').innerHTML = `
         </div>
 
         <div class="form-group">
-          <label for="price">Discount price:</label>
+          <label for="price">Price:</label>
           <input type="number" id="price" name="price" required>
         </div>
 
         <div class="form-group">
           <label for="original_price">Original price:</label>
           <input type="number" id="original_price" name="original_price" required>
-        </div>
-
-        <div class="form-group">
-          <label for="discount">Discount:</label>
-          <input type="number" id="discount" name="discount" required>
         </div>
 
         <div class="form-group">
