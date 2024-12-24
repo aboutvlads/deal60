@@ -43,18 +43,18 @@ async function signInWithEmail() {
 
 const prefillData = {
     id: generateUUID(),
-    from: 'New York',
-    to: 'Paris',
-    to_country: 'France',
-    to_country_emoji: '🇫🇷',
-    travel_dates_stops: 'Non-stop',
-    discount_price: 499,
+    departure: 'New York',
+    destination: 'Paris',
+    country: 'France',
+    flag: '🇫🇷',
+    stops: 'Non-stop',
+    price: 499,
     original_price: 899,
     discount: 400,
     posted_by: 'System',
     posted_by_avatar: 'https://example.com/avatar.jpg',
     posted_by_description: 'Deal Hunter',
-    cabin_type: 'Economy',
+    type: 'Economy',
     departure_time: '08:00',
     arrival_time: '20:00',
     flight_duration: '12h 00m',
@@ -136,15 +136,15 @@ async function displayDeals() {
                     <tbody>
                         ${data.map(deal => `
                             <tr>
-                                <td>${deal.to} ${deal.to_country_emoji || ''}</td>
+                                <td>${deal.destination} ${deal.flag || ''}</td>
                                 <td>
                                     <div class="price-info">
-                                        <span class="current-price">${formatPrice(deal.discount_price)}</span>
+                                        <span class="current-price">${formatPrice(deal.price)}</span>
                                         <span class="original-price">${formatPrice(deal.original_price)}</span>
                                     </div>
                                 </td>
-                                <td>${deal.from}</td>
-                                <td>${deal.cabin_type}</td>
+                                <td>${deal.departure}</td>
+                                <td>${deal.type}</td>
                                 <td>${formatDate(deal.created_at)}</td>
                                 <td>
                                     <div class="action-buttons">
@@ -217,24 +217,24 @@ async function initializeForm() {
             const formData = new FormData(e.target)
             const data = {
                 id: formData.get('id'),
-                to: formData.get('to'),
-                to_country: formData.get('to_country'),
-                to_country_emoji: formData.get('to_country_emoji'),
-                image_url: formData.get('image_url'),
-                discount_price: parseInt(formData.get('discount_price')),
+                departure: formData.get('departure'),
+                destination: formData.get('destination'),
+                country: formData.get('country'),
+                flag: formData.get('flag'),
+                stops: formData.get('stops'),
+                price: parseInt(formData.get('price')),
                 original_price: parseInt(formData.get('original_price')),
                 discount: parseInt(formData.get('discount')),
-                from: formData.get('from'),
-                travel_dates_stops: formData.get('travel_dates_stops'),
-                is_hot: formData.get('is_hot') === 'on',
-                cabin_type: formData.get('cabin_type'),
+                posted_by: formData.get('posted_by'),
+                posted_by_avatar: formData.get('posted_by_avatar'),
+                posted_by_description: formData.get('posted_by_description'),
+                type: formData.get('type'),
                 departure_time: formData.get('departure_time'),
                 arrival_time: formData.get('arrival_time'),
                 flight_duration: formData.get('flight_duration'),
                 url: formData.get('url'),
-                posted_by: formData.get('posted_by'),
-                posted_by_avatar: formData.get('posted_by_avatar'),
-                posted_by_description: formData.get('posted_by_description')
+                image_url: formData.get('image_url'),
+                is_hot: formData.get('is_hot') === 'on'
             }
 
             let error;
@@ -278,28 +278,28 @@ document.querySelector('#app').innerHTML = `
       
       <div class="form-grid">
         <div class="form-group">
-          <label for="from">From:</label>
-          <input type="text" id="from" name="from" required>
+          <label for="departure">From:</label>
+          <input type="text" id="departure" name="departure" required>
         </div>
 
         <div class="form-group">
-          <label for="to">To:</label>
-          <input type="text" id="to" name="to" required>
+          <label for="destination">To:</label>
+          <input type="text" id="destination" name="destination" required>
         </div>
 
         <div class="form-group">
-          <label for="to_country">To (country):</label>
-          <input type="text" id="to_country" name="to_country" required>
+          <label for="country">To (country):</label>
+          <input type="text" id="country" name="country" required>
         </div>
 
         <div class="form-group">
-          <label for="to_country_emoji">To (country emoji):</label>
-          <input type="text" id="to_country_emoji" name="to_country_emoji" placeholder="e.g. 🇫🇷">
+          <label for="flag">To (country emoji):</label>
+          <input type="text" id="flag" name="flag" placeholder="e.g. 🇫🇷">
         </div>
 
         <div class="form-group">
-          <label for="travel_dates_stops">Travel Dates • Stops:</label>
-          <select id="travel_dates_stops" name="travel_dates_stops" required>
+          <label for="stops">Travel Dates • Stops:</label>
+          <select id="stops" name="stops" required>
             <option value="Non-stop">Non-stop</option>
             <option value="1 Stop">1 Stop</option>
             <option value="2+ Stops">2+ Stops</option>
@@ -307,8 +307,8 @@ document.querySelector('#app').innerHTML = `
         </div>
 
         <div class="form-group">
-          <label for="discount_price">Discount price:</label>
-          <input type="number" id="discount_price" name="discount_price" required>
+          <label for="price">Discount price:</label>
+          <input type="number" id="price" name="price" required>
         </div>
 
         <div class="form-group">
@@ -337,8 +337,8 @@ document.querySelector('#app').innerHTML = `
         </div>
 
         <div class="form-group">
-          <label for="cabin_type">Cabin Type:</label>
-          <select id="cabin_type" name="cabin_type" required>
+          <label for="type">Cabin Type:</label>
+          <select id="type" name="type" required>
             <option value="Economy">Economy</option>
             <option value="Premium Economy">Premium Economy</option>
             <option value="Business">Business</option>
