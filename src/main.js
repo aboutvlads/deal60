@@ -43,25 +43,24 @@ async function signInWithEmail() {
 
 const prefillData = {
     id: generateUUID(),
-    destination: 'Paris',
-    country: 'France',
-    flag: '🇫🇷',
-    image_url: 'https://example.com/paris.jpg',
-    price: 499,
+    from: 'New York',
+    to: 'Paris',
+    to_country: 'France',
+    to_country_emoji: '🇫🇷',
+    travel_dates_stops: 'Non-stop',
+    discount_price: 499,
     original_price: 899,
     discount: 400,
-    departure: 'New York',
-    stops: 'Non-stop',
-    is_hot: true,
-    type: 'Economy',
-    likes: 0,
-    url: 'https://example.com/paris-deal',
+    posted_by: 'System',
+    posted_by_avatar: 'https://example.com/avatar.jpg',
+    posted_by_description: 'Deal Hunter',
+    cabin_type: 'Economy',
     departure_time: '08:00',
     arrival_time: '20:00',
     flight_duration: '12h 00m',
-    posted_by: 'System',
-    posted_by_avatar: 'https://example.com/avatar.jpg',
-    posted_by_description: 'Deal Hunter'
+    url: 'https://example.com/paris-deal',
+    image_url: 'https://example.com/paris.jpg',
+    is_hot: true
 }
 
 function prefillForm(data = prefillData) {
@@ -126,10 +125,10 @@ async function displayDeals() {
                 <table class="deals-table">
                     <thead>
                         <tr>
-                            <th>Destination</th>
+                            <th>To</th>
                             <th>Price</th>
-                            <th>Departure</th>
-                            <th>Type</th>
+                            <th>From</th>
+                            <th>Cabin Type</th>
                             <th>Created</th>
                             <th>Actions</th>
                         </tr>
@@ -137,20 +136,20 @@ async function displayDeals() {
                     <tbody>
                         ${data.map(deal => `
                             <tr>
-                                <td>${deal.destination} ${deal.flag || ''}</td>
+                                <td>${deal.to} ${deal.to_country_emoji || ''}</td>
                                 <td>
                                     <div class="price-info">
-                                        <span class="current-price">${formatPrice(deal.price)}</span>
+                                        <span class="current-price">${formatPrice(deal.discount_price)}</span>
                                         <span class="original-price">${formatPrice(deal.original_price)}</span>
                                     </div>
                                 </td>
-                                <td>${deal.departure}</td>
-                                <td>${deal.type}</td>
+                                <td>${deal.from}</td>
+                                <td>${deal.cabin_type}</td>
                                 <td>${formatDate(deal.created_at)}</td>
                                 <td>
                                     <div class="action-buttons">
-                                        <button onclick="window.editDeal('${deal.id}')" class="edit-btn">Edit</button>
-                                        <button onclick="window.deleteDeal('${deal.id}')" class="delete-btn">Delete</button>
+                                        <button onclick="editDeal('${deal.id}')" class="edit-btn">Edit</button>
+                                        <button onclick="deleteDeal('${deal.id}')" class="delete-btn">Delete</button>
                                     </div>
                                 </td>
                             </tr>
@@ -160,7 +159,8 @@ async function displayDeals() {
             </div>
         `
     } catch (error) {
-        console.error('Error displaying deals:', error)
+        console.error('Error fetching deals:', error)
+        alert('Error fetching deals: ' + error.message)
     }
 }
 
@@ -217,22 +217,21 @@ async function initializeForm() {
             const formData = new FormData(e.target)
             const data = {
                 id: formData.get('id'),
-                destination: formData.get('destination'),
-                country: formData.get('country'),
-                flag: formData.get('flag'),
+                to: formData.get('to'),
+                to_country: formData.get('to_country'),
+                to_country_emoji: formData.get('to_country_emoji'),
                 image_url: formData.get('image_url'),
-                price: parseInt(formData.get('price')),
+                discount_price: parseInt(formData.get('discount_price')),
                 original_price: parseInt(formData.get('original_price')),
                 discount: parseInt(formData.get('discount')),
-                departure: formData.get('departure'),
-                stops: formData.get('stops'),
+                from: formData.get('from'),
+                travel_dates_stops: formData.get('travel_dates_stops'),
                 is_hot: formData.get('is_hot') === 'on',
-                type: formData.get('type'),
-                likes: parseInt(formData.get('likes')) || 0,
-                url: formData.get('url'),
+                cabin_type: formData.get('cabin_type'),
                 departure_time: formData.get('departure_time'),
                 arrival_time: formData.get('arrival_time'),
                 flight_duration: formData.get('flight_duration'),
+                url: formData.get('url'),
                 posted_by: formData.get('posted_by'),
                 posted_by_avatar: formData.get('posted_by_avatar'),
                 posted_by_description: formData.get('posted_by_description')
@@ -281,28 +280,28 @@ document.querySelector('#app').innerHTML = `
         </div>
         
         <div class="form-group">
-          <label for="destination">Destination:</label>
-          <input type="text" id="destination" name="destination" required>
+          <label for="to">Destination:</label>
+          <input type="text" id="to" name="to" required>
         </div>
 
         <div class="form-group">
-          <label for="country">Country:</label>
-          <input type="text" id="country" name="country" required>
+          <label for="to_country">Country:</label>
+          <input type="text" id="to_country" name="to_country" required>
         </div>
 
         <div class="form-group">
-          <label for="flag">Flag:</label>
-          <input type="text" id="flag" name="flag" placeholder="e.g. 🇫🇷">
+          <label for="to_country_emoji">Flag:</label>
+          <input type="text" id="to_country_emoji" name="to_country_emoji" placeholder="e.g. 🇫🇷">
         </div>
 
         <div class="form-group">
-          <label for="departure">Departure:</label>
-          <input type="text" id="departure" name="departure" required>
+          <label for="from">Departure:</label>
+          <input type="text" id="from" name="from" required>
         </div>
 
         <div class="form-group">
-          <label for="stops">Stops:</label>
-          <select id="stops" name="stops" required>
+          <label for="travel_dates_stops">Stops:</label>
+          <select id="travel_dates_stops" name="travel_dates_stops" required>
             <option value="Non-stop">Non-stop</option>
             <option value="1 Stop">1 Stop</option>
             <option value="2+ Stops">2+ Stops</option>
@@ -310,8 +309,8 @@ document.querySelector('#app').innerHTML = `
         </div>
 
         <div class="form-group">
-          <label for="type">Cabin Type:</label>
-          <select id="type" name="type" required>
+          <label for="cabin_type">Cabin Type:</label>
+          <select id="cabin_type" name="cabin_type" required>
             <option value="Economy">Economy</option>
             <option value="Premium Economy">Premium Economy</option>
             <option value="Business">Business</option>
@@ -320,8 +319,8 @@ document.querySelector('#app').innerHTML = `
         </div>
 
         <div class="form-group">
-          <label for="price">Price ($):</label>
-          <input type="number" id="price" name="price" required>
+          <label for="discount_price">Price ($):</label>
+          <input type="number" id="discount_price" name="discount_price" required>
         </div>
 
         <div class="form-group">
@@ -359,11 +358,6 @@ document.querySelector('#app').innerHTML = `
         <div class="form-group">
           <label for="url">Deal URL:</label>
           <input type="url" id="url" name="url">
-        </div>
-
-        <div class="form-group">
-          <label for="likes">Likes:</label>
-          <input type="number" id="likes" name="likes">
         </div>
       </div>
 
