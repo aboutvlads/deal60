@@ -9,38 +9,104 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 let isEditing = false;
 let editingId = null;
 
-const countryEmojis = {
-    "Afghanistan": "🇦🇫", "Albania": "🇦🇱", "Algeria": "🇩🇿", "Andorra": "🇦🇩", "Angola": "🇦🇴", 
-    "Argentina": "🇦🇷", "Armenia": "🇦🇲", "Australia": "🇦🇺", "Austria": "🇦🇹", "Azerbaijan": "🇦🇿",
-    "Bahamas": "🇧🇸", "Bahrain": "🇧🇭", "Bangladesh": "🇧🇩", "Belgium": "🇧🇪", "Belize": "🇧🇿",
-    "Brazil": "🇧🇷", "Bulgaria": "🇧🇬", "Cambodia": "🇰🇭", "Cameroon": "🇨🇲", "Canada": "🇨🇦",
-    "Chile": "🇨🇱", "China": "🇨🇳", "Colombia": "🇨🇴", "Croatia": "🇭🇷", "Cuba": "🇨🇺",
-    "Cyprus": "🇨🇾", "Czech Republic": "🇨🇿", "Denmark": "🇩🇰", "Ecuador": "🇪🇨", "Egypt": "🇪🇬",
-    "Estonia": "🇪🇪", "Ethiopia": "🇪🇹", "Finland": "🇫🇮", "France": "🇫🇷", "Georgia": "🇬🇪",
-    "Germany": "🇩🇪", "Ghana": "🇬🇭", "Greece": "🇬🇷", "Greenland": "🇬🇱", "Hungary": "🇭🇺",
-    "Iceland": "🇮🇸", "India": "🇮🇳", "Indonesia": "🇮🇩", "Iran": "🇮🇷", "Iraq": "🇮🇶",
-    "Ireland": "🇮🇪", "Israel": "🇮🇱", "Italy": "🇮🇹", "Jamaica": "🇯🇲", "Japan": "🇯🇵",
-    "Jordan": "🇯🇴", "Kazakhstan": "🇰🇿", "Kenya": "🇰🇪", "Kuwait": "🇰🇼", "Latvia": "🇱🇻",
-    "Lebanon": "🇱🇧", "Libya": "🇱🇾", "Lithuania": "🇱🇹", "Luxembourg": "🇱🇺", "Malaysia": "🇲🇾",
-    "Maldives": "🇲🇻", "Malta": "🇲🇹", "Mexico": "🇲🇽", "Monaco": "🇲🇨", "Mongolia": "🇲🇳",
-    "Morocco": "🇲🇦", "Nepal": "🇳🇵", "Netherlands": "🇳🇱", "New Zealand": "🇳🇿", "Nigeria": "🇳🇬",
-    "North Korea": "🇰🇵", "Norway": "🇳🇴", "Oman": "🇴🇲", "Pakistan": "🇵🇰", "Panama": "🇵🇦",
-    "Peru": "🇵🇪", "Philippines": "🇵🇭", "Poland": "🇵🇱", "Portugal": "🇵🇹", "Qatar": "🇶🇦",
-    "Romania": "🇷🇴", "Russia": "🇷🇺", "Saudi Arabia": "🇸🇦", "Serbia": "🇷🇸", "Singapore": "🇸🇬",
-    "Slovakia": "🇸🇰", "Slovenia": "🇸🇮", "South Africa": "🇿🇦", "South Korea": "🇰🇷", "Spain": "🇪🇸",
-    "Sri Lanka": "🇱🇰", "Sweden": "🇸🇪", "Switzerland": "🇨🇭", "Syria": "🇸🇾", "Taiwan": "🇹🇼",
-    "Thailand": "🇹🇭", "Turkey": "🇹🇷", "Ukraine": "🇺🇦", "United Arab Emirates": "🇦🇪", 
-    "United Kingdom": "🇬🇧", "United States": "🇺🇸", "Uruguay": "🇺🇾", "Uzbekistan": "🇺🇿",
-    "Venezuela": "🇻🇪", "Vietnam": "🇻🇳", "Yemen": "🇾🇪"
-};
+// Country data with emojis
+const countries = [
+    { name: 'Afghanistan', code: 'AF', emoji: '🇦🇫' },
+    { name: 'Albania', code: 'AL', emoji: '🇦🇱' },
+    { name: 'Algeria', code: 'DZ', emoji: '🇩🇿' },
+    { name: 'Argentina', code: 'AR', emoji: '🇦🇷' },
+    { name: 'Australia', code: 'AU', emoji: '🇦🇺' },
+    { name: 'Austria', code: 'AT', emoji: '🇦🇹' },
+    { name: 'Belgium', code: 'BE', emoji: '🇧🇪' },
+    { name: 'Brazil', code: 'BR', emoji: '🇧🇷' },
+    { name: 'Canada', code: 'CA', emoji: '🇨🇦' },
+    { name: 'China', code: 'CN', emoji: '🇨🇳' },
+    { name: 'Colombia', code: 'CO', emoji: '🇨🇴' },
+    { name: 'Croatia', code: 'HR', emoji: '🇭🇷' },
+    { name: 'Czech Republic', code: 'CZ', emoji: '🇨🇿' },
+    { name: 'Denmark', code: 'DK', emoji: '🇩🇰' },
+    { name: 'Egypt', code: 'EG', emoji: '🇪🇬' },
+    { name: 'Finland', code: 'FI', emoji: '🇫🇮' },
+    { name: 'France', code: 'FR', emoji: '🇫🇷' },
+    { name: 'Germany', code: 'DE', emoji: '🇩🇪' },
+    { name: 'Greece', code: 'GR', emoji: '🇬🇷' },
+    { name: 'Hungary', code: 'HU', emoji: '🇭🇺' },
+    { name: 'Iceland', code: 'IS', emoji: '🇮🇸' },
+    { name: 'India', code: 'IN', emoji: '🇮🇳' },
+    { name: 'Indonesia', code: 'ID', emoji: '🇮🇩' },
+    { name: 'Ireland', code: 'IE', emoji: '🇮🇪' },
+    { name: 'Israel', code: 'IL', emoji: '🇮🇱' },
+    { name: 'Italy', code: 'IT', emoji: '🇮🇹' },
+    { name: 'Japan', code: 'JP', emoji: '🇯🇵' },
+    { name: 'Malaysia', code: 'MY', emoji: '🇲🇾' },
+    { name: 'Mexico', code: 'MX', emoji: '🇲🇽' },
+    { name: 'Netherlands', code: 'NL', emoji: '🇳🇱' },
+    { name: 'New Zealand', code: 'NZ', emoji: '🇳🇿' },
+    { name: 'Norway', code: 'NO', emoji: '🇳🇴' },
+    { name: 'Poland', code: 'PL', emoji: '🇵🇱' },
+    { name: 'Portugal', code: 'PT', emoji: '🇵🇹' },
+    { name: 'Romania', code: 'RO', emoji: '🇷🇴' },
+    { name: 'Russia', code: 'RU', emoji: '🇷🇺' },
+    { name: 'Saudi Arabia', code: 'SA', emoji: '🇸🇦' },
+    { name: 'Singapore', code: 'SG', emoji: '🇸🇬' },
+    { name: 'South Africa', code: 'ZA', emoji: '🇿🇦' },
+    { name: 'South Korea', code: 'KR', emoji: '🇰🇷' },
+    { name: 'Spain', code: 'ES', emoji: '🇪🇸' },
+    { name: 'Sweden', code: 'SE', emoji: '🇸🇪' },
+    { name: 'Switzerland', code: 'CH', emoji: '🇨🇭' },
+    { name: 'Thailand', code: 'TH', emoji: '🇹🇭' },
+    { name: 'Turkey', code: 'TR', emoji: '🇹🇷' },
+    { name: 'Ukraine', code: 'UA', emoji: '🇺🇦' },
+    { name: 'United Arab Emirates', code: 'AE', emoji: '🇦🇪' },
+    { name: 'United Kingdom', code: 'GB', emoji: '🇬🇧' },
+    { name: 'United States', code: 'US', emoji: '🇺🇸' },
+    { name: 'Vietnam', code: 'VN', emoji: '🇻🇳' }
+];
 
-function handleCountrySelection(event) {
-    const input = event.target;
-    const selectedCountry = input.value;
-    const emoji = countryEmojis[selectedCountry];
-    if (emoji) {
-        document.getElementById('flag').value = emoji;
-    }
+function setupCountrySearch() {
+    const countryInput = document.getElementById('country');
+    const flagInput = document.getElementById('flag');
+    const countryList = document.createElement('div');
+    countryList.className = 'country-list';
+    countryInput.parentNode.appendChild(countryList);
+
+    countryInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const matches = countries.filter(country => 
+            country.name.toLowerCase().includes(searchTerm)
+        );
+
+        if (searchTerm && matches.length > 0) {
+            countryList.innerHTML = matches
+                .slice(0, 5) // Show only first 5 matches
+                .map(country => `
+                    <div class="country-item" data-name="${country.name}" data-emoji="${country.emoji}">
+                        ${country.emoji} ${country.name}
+                    </div>
+                `).join('');
+            countryList.style.display = 'block';
+        } else {
+            countryList.style.display = 'none';
+        }
+    });
+
+    countryList.addEventListener('click', function(e) {
+        const item = e.target.closest('.country-item');
+        if (item) {
+            const countryName = item.dataset.name;
+            const emoji = item.dataset.emoji;
+            countryInput.value = countryName;
+            flagInput.value = emoji;
+            countryList.style.display = 'none';
+        }
+    });
+
+    // Hide country list when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!countryInput.contains(e.target) && !countryList.contains(e.target)) {
+            countryList.style.display = 'none';
+        }
+    });
 }
 
 function generateUUID() {
@@ -242,6 +308,7 @@ async function initializeForm() {
     if (!form) return
 
     await signInWithEmail()
+    setupCountrySearch()
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault()
@@ -323,17 +390,7 @@ document.querySelector('#app').innerHTML = `
 
         <div class="form-group">
           <label for="country">To (country):</label>
-          <input type="text" 
-                 id="country" 
-                 name="country" 
-                 list="countryList" 
-                 onchange="handleCountrySelection(event)"
-                 required>
-          <datalist id="countryList">
-            ${Object.keys(countryEmojis).map(country => `
-              <option value="${country}">${country} ${countryEmojis[country]}</option>
-            `).join('')}
-          </datalist>
+          <input type="text" id="country" name="country" required>
         </div>
 
         <div class="form-group">
@@ -426,6 +483,37 @@ document.querySelector('#app').innerHTML = `
     <div id="dealsList" class="deals-list"></div>
   </div>
 `
+
+const style = document.createElement('style');
+style.textContent = `
+    .country-list {
+        display: none;
+        position: absolute;
+        max-height: 200px;
+        overflow-y: auto;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        z-index: 1000;
+        width: 100%;
+    }
+
+    .country-item {
+        padding: 8px 12px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .country-item:hover {
+        background-color: #f5f5f5;
+    }
+
+    .form-group {
+        position: relative;
+    }
+`;
+document.head.appendChild(style);
 
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', async () => {

@@ -181,24 +181,3 @@ button {
   opacity: 0.7;
   pointer-events: none;
 }
-
-/* Add styles for the country selector */
-input[list="countryList"] {
-  background-color: white;
-}
-
-input[list="countryList"]::-webkit-calendar-picker-indicator {
-  opacity: 0.6;
-}
-
-#flag {
-  background-color: #f8f9fa;
-  font-size: 1.2rem;
-  text-align: center;
-}
-
-/* Make readonly inputs look different but not disabled */
-input[readonly] {
-  background-color: #f8f9fa;
-  cursor: default;
-}
