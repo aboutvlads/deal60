@@ -272,40 +272,68 @@ window.deleteDeal = deleteDeal;
 document.querySelector('#app').innerHTML = `
   <div class="container">
     <h1>Travel Deals Manager</h1>
-    <form id="dealForm" class="form-container">
+    
+    <form id="dealForm" class="deal-form">
+      <input type="hidden" id="id" name="id">
+      
       <div class="form-grid">
         <div class="form-group">
-          <label for="id">ID (auto-generated):</label>
-          <input type="text" id="id" name="id" readonly>
-        </div>
-        
-        <div class="form-group">
-          <label for="to">Destination:</label>
-          <input type="text" id="to" name="to" required>
-        </div>
-
-        <div class="form-group">
-          <label for="to_country">Country:</label>
-          <input type="text" id="to_country" name="to_country" required>
-        </div>
-
-        <div class="form-group">
-          <label for="to_country_emoji">Flag:</label>
-          <input type="text" id="to_country_emoji" name="to_country_emoji" placeholder="e.g. 🇫🇷">
-        </div>
-
-        <div class="form-group">
-          <label for="from">Departure:</label>
+          <label for="from">From:</label>
           <input type="text" id="from" name="from" required>
         </div>
 
         <div class="form-group">
-          <label for="travel_dates_stops">Stops:</label>
+          <label for="to">To:</label>
+          <input type="text" id="to" name="to" required>
+        </div>
+
+        <div class="form-group">
+          <label for="to_country">To (country):</label>
+          <input type="text" id="to_country" name="to_country" required>
+        </div>
+
+        <div class="form-group">
+          <label for="to_country_emoji">To (country emoji):</label>
+          <input type="text" id="to_country_emoji" name="to_country_emoji" placeholder="e.g. 🇫🇷">
+        </div>
+
+        <div class="form-group">
+          <label for="travel_dates_stops">Travel Dates • Stops:</label>
           <select id="travel_dates_stops" name="travel_dates_stops" required>
             <option value="Non-stop">Non-stop</option>
             <option value="1 Stop">1 Stop</option>
             <option value="2+ Stops">2+ Stops</option>
           </select>
+        </div>
+
+        <div class="form-group">
+          <label for="discount_price">Discount price:</label>
+          <input type="number" id="discount_price" name="discount_price" required>
+        </div>
+
+        <div class="form-group">
+          <label for="original_price">Original price:</label>
+          <input type="number" id="original_price" name="original_price" required>
+        </div>
+
+        <div class="form-group">
+          <label for="discount">Discount:</label>
+          <input type="number" id="discount" name="discount" required>
+        </div>
+
+        <div class="form-group">
+          <label for="posted_by">Posted By:</label>
+          <input type="text" id="posted_by" name="posted_by" required>
+        </div>
+
+        <div class="form-group">
+          <label for="posted_by_avatar">Posted By Avatar:</label>
+          <input type="url" id="posted_by_avatar" name="posted_by_avatar">
+        </div>
+
+        <div class="form-group">
+          <label for="posted_by_description">Posted By Description:</label>
+          <input type="text" id="posted_by_description" name="posted_by_description">
         </div>
 
         <div class="form-group">
@@ -319,77 +347,43 @@ document.querySelector('#app').innerHTML = `
         </div>
 
         <div class="form-group">
-          <label for="discount_price">Price ($):</label>
-          <input type="number" id="discount_price" name="discount_price" required>
-        </div>
-
-        <div class="form-group">
-          <label for="original_price">Original Price ($):</label>
-          <input type="number" id="original_price" name="original_price" required>
-        </div>
-
-        <div class="form-group">
-          <label for="discount">Discount ($):</label>
-          <input type="number" id="discount" name="discount" required>
-        </div>
-
-        <div class="form-group">
           <label for="departure_time">Departure Time:</label>
-          <input type="text" id="departure_time" name="departure_time" placeholder="e.g. 08:00">
+          <input type="time" id="departure_time" name="departure_time" required>
         </div>
 
         <div class="form-group">
           <label for="arrival_time">Arrival Time:</label>
-          <input type="text" id="arrival_time" name="arrival_time" placeholder="e.g. 12:00">
+          <input type="time" id="arrival_time" name="arrival_time" required>
         </div>
 
         <div class="form-group">
           <label for="flight_duration">Flight Duration:</label>
-          <input type="text" id="flight_duration" name="flight_duration" placeholder="e.g. 5h 30m">
-        </div>
-      </div>
-
-      <div class="form-grid">
-        <div class="form-group">
-          <label for="image_url">Image URL:</label>
-          <input type="url" id="image_url" name="image_url">
+          <input type="text" id="flight_duration" name="flight_duration" placeholder="e.g. 2h 30m" required>
         </div>
 
         <div class="form-group">
-          <label for="url">Deal URL:</label>
-          <input type="url" id="url" name="url">
-        </div>
-      </div>
-
-      <div class="form-grid">
-        <div class="form-group">
-          <label for="posted_by">Posted By:</label>
-          <input type="text" id="posted_by" name="posted_by">
+          <label for="url">URL:</label>
+          <input type="url" id="url" name="url" required>
         </div>
 
         <div class="form-group">
-          <label for="posted_by_avatar">Posted By Avatar:</label>
-          <input type="url" id="posted_by_avatar" name="posted_by_avatar">
+          <label for="image_url">Image URL:</label>
+          <input type="url" id="image_url" name="image_url" required>
         </div>
 
-        <div class="form-group">
-          <label for="posted_by_description">Posted By Description:</label>
-          <input type="text" id="posted_by_description" name="posted_by_description">
-        </div>
-      </div>
-
-      <div class="form-group checkbox-group">
-        <label>
+        <div class="form-group checkbox-group">
+          <label for="is_hot">Is HOT DEAL?</label>
           <input type="checkbox" id="is_hot" name="is_hot">
-          Hot Deal
-        </label>
+        </div>
       </div>
 
-      <button type="submit">Add Deal</button>
+      <div class="form-actions">
+        <button type="submit" class="submit-btn">Add Deal</button>
+        <button type="button" class="reset-btn" onclick="prefillForm()">Reset</button>
+      </div>
     </form>
 
-    <h2>Recent Deals</h2>
-    <div id="dealsList"></div>
+    <div id="dealsList" class="deals-list"></div>
   </div>
 `
 
