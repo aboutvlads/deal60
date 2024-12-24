@@ -395,8 +395,20 @@ function updateFlag() {
 function updateCountryFromCity() {
     const cityInput = document.getElementById('destination');
     const countryInput = document.getElementById('country');
-    const city = cityInput.value.trim();
-    const country = cityToCountry[city];
+    const inputCity = cityInput.value.trim();
+    
+    // Try exact match first, then case-insensitive match
+    let country = cityToCountry[inputCity];
+    if (!country) {
+        const cityKey = Object.keys(cityToCountry).find(
+            city => city.toLowerCase() === inputCity.toLowerCase()
+        );
+        if (cityKey) {
+            country = cityToCountry[cityKey];
+            // Update the input to the correct case
+            cityInput.value = cityKey;
+        }
+    }
     
     if (country) {
         countryInput.value = country;
@@ -419,7 +431,11 @@ document.querySelector('#app').innerHTML = `
 
         <div class="form-group">
           <label for="destination">To:</label>
-          <input type="text" id="destination" name="destination" list="cityList" onchange="updateCountryFromCity()" required>
+          <input type="text" id="destination" name="destination" 
+                 list="cityList" 
+                 oninput="updateCountryFromCity()" 
+                 onchange="updateCountryFromCity()" 
+                 required>
           <datalist id="cityList">
             ${Object.keys(cityToCountry).map(city => `<option value="${city}">`).join('')}
           </datalist>
