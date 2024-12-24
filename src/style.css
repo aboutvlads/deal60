@@ -74,6 +74,57 @@ h1 {
   width: auto;
 }
 
+.flag-input-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.flag-input-group input {
+  flex: 1;
+}
+
+.flag-picker-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 200px;
+}
+
+.country-search {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  width: 100%;
+}
+
+.country-search:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+.flag-picker {
+  min-width: 200px;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  background-color: white;
+  cursor: pointer;
+  width: 100%;
+  max-height: 300px;
+}
+
+.flag-picker:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+.flag-picker option {
+  padding: 0.5rem;
+  font-size: 1rem;
+}
+
 .form-actions {
   display: flex;
   gap: 1rem;
