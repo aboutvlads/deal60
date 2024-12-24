@@ -9,6 +9,40 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 let isEditing = false;
 let editingId = null;
 
+const countryEmojis = {
+    "Afghanistan": "🇦🇫", "Albania": "🇦🇱", "Algeria": "🇩🇿", "Andorra": "🇦🇩", "Angola": "🇦🇴", 
+    "Argentina": "🇦🇷", "Armenia": "🇦🇲", "Australia": "🇦🇺", "Austria": "🇦🇹", "Azerbaijan": "🇦🇿",
+    "Bahamas": "🇧🇸", "Bahrain": "🇧🇭", "Bangladesh": "🇧🇩", "Belgium": "🇧🇪", "Belize": "🇧🇿",
+    "Brazil": "🇧🇷", "Bulgaria": "🇧🇬", "Cambodia": "🇰🇭", "Cameroon": "🇨🇲", "Canada": "🇨🇦",
+    "Chile": "🇨🇱", "China": "🇨🇳", "Colombia": "🇨🇴", "Croatia": "🇭🇷", "Cuba": "🇨🇺",
+    "Cyprus": "🇨🇾", "Czech Republic": "🇨🇿", "Denmark": "🇩🇰", "Ecuador": "🇪🇨", "Egypt": "🇪🇬",
+    "Estonia": "🇪🇪", "Ethiopia": "🇪🇹", "Finland": "🇫🇮", "France": "🇫🇷", "Georgia": "🇬🇪",
+    "Germany": "🇩🇪", "Ghana": "🇬🇭", "Greece": "🇬🇷", "Greenland": "🇬🇱", "Hungary": "🇭🇺",
+    "Iceland": "🇮🇸", "India": "🇮🇳", "Indonesia": "🇮🇩", "Iran": "🇮🇷", "Iraq": "🇮🇶",
+    "Ireland": "🇮🇪", "Israel": "🇮🇱", "Italy": "🇮🇹", "Jamaica": "🇯🇲", "Japan": "🇯🇵",
+    "Jordan": "🇯🇴", "Kazakhstan": "🇰🇿", "Kenya": "🇰🇪", "Kuwait": "🇰🇼", "Latvia": "🇱🇻",
+    "Lebanon": "🇱🇧", "Libya": "🇱🇾", "Lithuania": "🇱🇹", "Luxembourg": "🇱🇺", "Malaysia": "🇲🇾",
+    "Maldives": "🇲🇻", "Malta": "🇲🇹", "Mexico": "🇲🇽", "Monaco": "🇲🇨", "Mongolia": "🇲🇳",
+    "Morocco": "🇲🇦", "Nepal": "🇳🇵", "Netherlands": "🇳🇱", "New Zealand": "🇳🇿", "Nigeria": "🇳🇬",
+    "North Korea": "🇰🇵", "Norway": "🇳🇴", "Oman": "🇴🇲", "Pakistan": "🇵🇰", "Panama": "🇵🇦",
+    "Peru": "🇵🇪", "Philippines": "🇵🇭", "Poland": "🇵🇱", "Portugal": "🇵🇹", "Qatar": "🇶🇦",
+    "Romania": "🇷🇴", "Russia": "🇷🇺", "Saudi Arabia": "🇸🇦", "Serbia": "🇷🇸", "Singapore": "🇸🇬",
+    "Slovakia": "🇸🇰", "Slovenia": "🇸🇮", "South Africa": "🇿🇦", "South Korea": "🇰🇷", "Spain": "🇪🇸",
+    "Sri Lanka": "🇱🇰", "Sweden": "🇸🇪", "Switzerland": "🇨🇭", "Syria": "🇸🇾", "Taiwan": "🇹🇼",
+    "Thailand": "🇹🇭", "Turkey": "🇹🇷", "Ukraine": "🇺🇦", "United Arab Emirates": "🇦🇪", 
+    "United Kingdom": "🇬🇧", "United States": "🇺🇸", "Uruguay": "🇺🇾", "Uzbekistan": "🇺🇿",
+    "Venezuela": "🇻🇪", "Vietnam": "🇻🇳", "Yemen": "🇾🇪"
+};
+
+function handleCountrySelection(event) {
+    const input = event.target;
+    const selectedCountry = input.value;
+    const emoji = countryEmojis[selectedCountry];
+    if (emoji) {
+        document.getElementById('flag').value = emoji;
+    }
+}
+
 function generateUUID() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         const r = Math.random() * 16 | 0
@@ -289,12 +323,22 @@ document.querySelector('#app').innerHTML = `
 
         <div class="form-group">
           <label for="country">To (country):</label>
-          <input type="text" id="country" name="country" required>
+          <input type="text" 
+                 id="country" 
+                 name="country" 
+                 list="countryList" 
+                 onchange="handleCountrySelection(event)"
+                 required>
+          <datalist id="countryList">
+            ${Object.keys(countryEmojis).map(country => `
+              <option value="${country}">${country} ${countryEmojis[country]}</option>
+            `).join('')}
+          </datalist>
         </div>
 
         <div class="form-group">
           <label for="flag">To (country emoji):</label>
-          <input type="text" id="flag" name="flag" placeholder="e.g. 🇫🇷">
+          <input type="text" id="flag" name="flag" readonly>
         </div>
 
         <div class="form-group">
