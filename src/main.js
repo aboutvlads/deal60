@@ -265,346 +265,42 @@ async function initializeForm() {
     })
 }
 
+// Make functions available globally for onclick handlers
+window.editDeal = editDeal;
+window.deleteDeal = deleteDeal;
+
 const countryEmojis = {
-    'Afghanistan': '🇦🇫',
-    'Albania': '🇦🇱',
-    'Algeria': '🇩🇿',
-    'Andorra': '🇦🇩',
-    'Angola': '🇦🇴',
-    'Antigua and Barbuda': '🇦🇬',
-    'Argentina': '🇦🇷',
-    'Armenia': '🇦🇲',
-    'Australia': '🇦🇺',
-    'Austria': '🇦🇹',
-    'Azerbaijan': '🇦🇿',
-    'Bahamas': '🇧🇸',
-    'Bahrain': '🇧🇭',
-    'Bangladesh': '🇧🇩',
-    'Barbados': '🇧🇧',
-    'Belarus': '🇧🇾',
-    'Belgium': '🇧🇪',
-    'Belize': '🇧🇿',
-    'Benin': '🇧🇯',
-    'Bhutan': '🇧🇹',
-    'Bolivia': '🇧🇴',
-    'Bosnia and Herzegovina': '🇧🇦',
-    'Botswana': '🇧🇼',
-    'Brazil': '🇧🇷',
-    'Brunei': '🇧🇳',
-    'Bulgaria': '🇧🇬',
-    'Burkina Faso': '🇧🇫',
-    'Burundi': '🇧🇮',
-    'Cambodia': '🇰🇭',
-    'Cameroon': '🇨🇲',
-    'Canada': '🇨🇦',
-    'Cape Verde': '🇨🇻',
-    'Central African Republic': '🇨🇫',
-    'Chad': '🇹🇩',
-    'Chile': '🇨🇱',
-    'China': '🇨🇳',
-    'Colombia': '🇨🇴',
-    'Comoros': '🇰🇲',
-    'Congo': '🇨🇬',
-    'Costa Rica': '🇨🇷',
-    'Croatia': '🇭🇷',
-    'Cuba': '🇨🇺',
-    'Cyprus': '🇨🇾',
-    'Czech Republic': '🇨🇿',
-    'Denmark': '🇩🇰',
-    'Djibouti': '🇩🇯',
-    'Dominica': '🇩🇲',
-    'Dominican Republic': '🇩🇴',
-    'DR Congo': '🇨🇩',
-    'Ecuador': '🇪🇨',
-    'Egypt': '🇪🇬',
-    'El Salvador': '🇸🇻',
-    'Equatorial Guinea': '🇬🇶',
-    'Eritrea': '🇪🇷',
-    'Estonia': '🇪🇪',
-    'Eswatini': '🇸🇿',
-    'Ethiopia': '🇪🇹',
-    'Fiji': '🇫🇯',
-    'Finland': '🇫🇮',
-    'France': '🇫🇷',
-    'Gabon': '🇬🇦',
-    'Gambia': '🇬🇲',
-    'Georgia': '🇬🇪',
-    'Germany': '🇩🇪',
-    'Ghana': '🇬🇭',
-    'Greece': '🇬🇷',
-    'Grenada': '🇬🇩',
-    'Guatemala': '🇬🇹',
-    'Guinea': '🇬🇳',
-    'Guinea-Bissau': '🇬🇼',
-    'Guyana': '🇬🇾',
-    'Haiti': '🇭🇹',
-    'Honduras': '🇭🇳',
-    'Hungary': '🇭🇺',
-    'Iceland': '🇮🇸',
-    'India': '🇮🇳',
-    'Indonesia': '🇮🇩',
-    'Iran': '🇮🇷',
-    'Iraq': '🇮🇶',
-    'Ireland': '🇮🇪',
-    'Israel': '🇮🇱',
-    'Italy': '🇮🇹',
-    'Ivory Coast': '🇨🇮',
-    'Jamaica': '🇯🇲',
-    'Japan': '🇯🇵',
-    'Jordan': '🇯🇴',
-    'Kazakhstan': '🇰🇿',
-    'Kenya': '🇰🇪',
-    'Kiribati': '🇰🇮',
-    'Kuwait': '🇰🇼',
-    'Kyrgyzstan': '🇰🇬',
-    'Laos': '🇱🇦',
-    'Latvia': '🇱🇻',
-    'Lebanon': '🇱🇧',
-    'Lesotho': '🇱🇸',
-    'Liberia': '🇱🇷',
-    'Libya': '🇱🇾',
-    'Liechtenstein': '🇱🇮',
-    'Lithuania': '🇱🇹',
-    'Luxembourg': '🇱🇺',
-    'Madagascar': '🇲🇬',
-    'Malawi': '🇲🇼',
-    'Malaysia': '🇲🇾',
-    'Maldives': '🇲🇻',
-    'Mali': '🇲🇱',
-    'Malta': '🇲🇹',
-    'Marshall Islands': '🇲🇭',
-    'Mauritania': '🇲🇷',
-    'Mauritius': '🇲🇺',
-    'Mexico': '🇲🇽',
-    'Micronesia': '🇫🇲',
-    'Moldova': '🇲🇩',
-    'Monaco': '🇲🇨',
-    'Mongolia': '🇲🇳',
-    'Montenegro': '🇲🇪',
-    'Morocco': '🇲🇦',
-    'Mozambique': '🇲🇿',
-    'Myanmar': '🇲🇲',
-    'Namibia': '🇳🇦',
-    'Nauru': '🇳🇷',
-    'Nepal': '🇳🇵',
-    'Netherlands': '🇳🇱',
-    'New Zealand': '🇳🇿',
-    'Nicaragua': '🇳🇮',
-    'Niger': '🇳🇪',
-    'Nigeria': '🇳🇬',
-    'North Korea': '🇰🇵',
-    'North Macedonia': '🇲🇰',
-    'Norway': '🇳🇴',
-    'Oman': '🇴🇲',
-    'Pakistan': '🇵🇰',
-    'Palau': '🇵🇼',
-    'Palestine': '🇵🇸',
-    'Panama': '🇵🇦',
-    'Papua New Guinea': '🇵🇬',
-    'Paraguay': '🇵🇾',
-    'Peru': '🇵🇪',
-    'Philippines': '🇵🇭',
-    'Poland': '🇵🇱',
-    'Portugal': '🇵🇹',
-    'Qatar': '🇶🇦',
-    'Romania': '🇷🇴',
-    'Russia': '🇷🇺',
-    'Rwanda': '🇷🇼',
-    'Saint Kitts and Nevis': '🇰🇳',
-    'Saint Lucia': '🇱🇨',
-    'Saint Vincent and the Grenadines': '🇻🇨',
-    'Samoa': '🇼🇸',
-    'San Marino': '🇸🇲',
-    'Sao Tome and Principe': '🇸🇹',
-    'Saudi Arabia': '🇸🇦',
-    'Senegal': '🇸🇳',
-    'Serbia': '🇷🇸',
-    'Seychelles': '🇸🇨',
-    'Sierra Leone': '🇸🇱',
-    'Singapore': '🇸🇬',
-    'Slovakia': '🇸🇰',
-    'Slovenia': '🇸🇮',
-    'Solomon Islands': '🇸🇧',
-    'Somalia': '🇸🇴',
-    'South Africa': '🇿🇦',
-    'South Korea': '🇰🇷',
-    'South Sudan': '🇸🇸',
-    'Spain': '🇪🇸',
-    'Sri Lanka': '🇱🇰',
-    'Sudan': '🇸🇩',
-    'Suriname': '🇸🇷',
-    'Sweden': '🇸🇪',
-    'Switzerland': '🇨🇭',
-    'Syria': '🇸🇾',
-    'Taiwan': '🇹🇼',
-    'Tajikistan': '🇹🇯',
-    'Tanzania': '🇹🇿',
-    'Thailand': '🇹🇭',
-    'Timor-Leste': '🇹🇱',
-    'Togo': '🇹🇬',
-    'Tonga': '🇹🇴',
-    'Trinidad and Tobago': '🇹🇹',
-    'Tunisia': '🇹🇳',
-    'Turkey': '🇹🇷',
-    'Turkmenistan': '🇹🇲',
-    'Tuvalu': '🇹🇻',
-    'Uganda': '🇺🇬',
-    'Ukraine': '🇺🇦',
-    'United Arab Emirates': '🇦🇪',
-    'United Kingdom': '🇬🇧',
-    'United States': '🇺🇸',
-    'Uruguay': '🇺🇾',
-    'Uzbekistan': '🇺🇿',
-    'Vanuatu': '🇻🇺',
-    'Vatican City': '🇻🇦',
-    'Venezuela': '🇻🇪',
-    'Vietnam': '🇻🇳',
-    'Yemen': '🇾🇪',
-    'Zambia': '🇿🇲',
-    'Zimbabwe': '🇿🇼'
+    "Afghanistan": "🇦🇫", "Albania": "🇦🇱", "Algeria": "🇩🇿", "Andorra": "🇦🇩", "Angola": "🇦🇴", 
+    "Argentina": "🇦🇷", "Armenia": "🇦🇲", "Australia": "🇦🇺", "Austria": "🇦🇹", "Azerbaijan": "🇦🇿",
+    "Bahamas": "🇧🇸", "Bahrain": "🇧🇭", "Bangladesh": "🇧🇩", "Belgium": "🇧🇪", "Belize": "🇧🇿",
+    "Brazil": "🇧🇷", "Bulgaria": "🇧🇬", "Cambodia": "🇰🇭", "Cameroon": "🇨🇲", "Canada": "🇨🇦",
+    "Chile": "🇨🇱", "China": "🇨🇳", "Colombia": "🇨🇴", "Croatia": "🇭🇷", "Cuba": "🇨🇺",
+    "Cyprus": "🇨🇾", "Czech Republic": "🇨🇿", "Denmark": "🇩🇰", "Egypt": "🇪🇬", "Estonia": "🇪🇪",
+    "Finland": "🇫🇮", "France": "🇫🇷", "Georgia": "🇬🇪", "Germany": "🇩🇪", "Ghana": "🇬🇭",
+    "Greece": "🇬🇷", "Hungary": "🇭🇺", "Iceland": "🇮🇸", "India": "🇮🇳", "Indonesia": "🇮🇩",
+    "Iran": "🇮🇷", "Iraq": "🇮🇶", "Ireland": "🇮🇪", "Israel": "🇮🇱", "Italy": "🇮🇹",
+    "Jamaica": "🇯🇲", "Japan": "🇯🇵", "Jordan": "🇯🇴", "Kazakhstan": "🇰🇿", "Kenya": "🇰🇪",
+    "Kuwait": "🇰🇼", "Latvia": "🇱🇻", "Lebanon": "🇱🇧", "Libya": "🇱🇾", "Lithuania": "🇱🇹",
+    "Luxembourg": "🇱🇺", "Malaysia": "🇲🇾", "Maldives": "🇲🇻", "Malta": "🇲🇹", "Mexico": "🇲🇽",
+    "Monaco": "🇲🇨", "Mongolia": "🇲🇳", "Morocco": "🇲🇦", "Nepal": "🇳🇵", "Netherlands": "🇳🇱",
+    "New Zealand": "🇳🇿", "Nigeria": "🇳🇬", "North Korea": "🇰🇵", "Norway": "🇳🇴", "Oman": "🇴🇲",
+    "Pakistan": "🇵🇰", "Panama": "🇵🇦", "Peru": "🇵🇪", "Philippines": "🇵🇭", "Poland": "🇵🇱",
+    "Portugal": "🇵🇹", "Qatar": "🇶🇦", "Romania": "🇷🇴", "Russia": "🇷🇺", "Saudi Arabia": "🇸🇦",
+    "Serbia": "🇷🇸", "Singapore": "🇸🇬", "Slovakia": "🇸🇰", "Slovenia": "🇸🇮", "South Africa": "🇿🇦",
+    "South Korea": "🇰🇷", "Spain": "🇪🇸", "Sri Lanka": "🇱🇰", "Sweden": "🇸🇪", "Switzerland": "🇨🇭",
+    "Syria": "🇸🇾", "Taiwan": "🇹🇼", "Thailand": "🇹🇭", "Turkey": "🇹🇷", "Ukraine": "🇺🇦",
+    "United Arab Emirates": "🇦🇪", "United Kingdom": "🇬🇧", "United States": "🇺🇸", "Uruguay": "🇺🇾", 
+    "Uzbekistan": "🇺🇿", "Venezuela": "🇻🇪", "Vietnam": "🇻🇳", "Yemen": "🇾🇪"
 };
 
-const cityToCountry = {
-    // Europe
-    'Paris': 'France',
-    'London': 'United Kingdom',
-    'Rome': 'Italy',
-    'Madrid': 'Spain',
-    'Berlin': 'Germany',
-    'Amsterdam': 'Netherlands',
-    'Barcelona': 'Spain',
-    'Prague': 'Czech Republic',
-    'Vienna': 'Austria',
-    'Venice': 'Italy',
-    'Milan': 'Italy',
-    'Munich': 'Germany',
-    'Dublin': 'Ireland',
-    'Brussels': 'Belgium',
-    'Lisbon': 'Portugal',
-    'Athens': 'Greece',
-    'Stockholm': 'Sweden',
-    'Copenhagen': 'Denmark',
-    'Oslo': 'Norway',
-    'Helsinki': 'Finland',
-    'Zurich': 'Switzerland',
-    'Geneva': 'Switzerland',
-    'Budapest': 'Hungary',
-    'Warsaw': 'Poland',
-    'Istanbul': 'Turkey',
-
-    // Asia
-    'Tokyo': 'Japan',
-    'Bangkok': 'Thailand',
-    'Singapore': 'Singapore',
-    'Hong Kong': 'China',
-    'Dubai': 'United Arab Emirates',
-    'Seoul': 'South Korea',
-    'Taipei': 'Taiwan',
-    'Beijing': 'China',
-    'Shanghai': 'China',
-    'Mumbai': 'India',
-    'Delhi': 'India',
-    'Kuala Lumpur': 'Malaysia',
-    'Manila': 'Philippines',
-    'Ho Chi Minh City': 'Vietnam',
-    'Hanoi': 'Vietnam',
-    'Jakarta': 'Indonesia',
-    'Bali': 'Indonesia',
-    'Phuket': 'Thailand',
-
-    // Americas
-    'New York': 'United States',
-    'Los Angeles': 'United States',
-    'Chicago': 'United States',
-    'Miami': 'United States',
-    'San Francisco': 'United States',
-    'Las Vegas': 'United States',
-    'Toronto': 'Canada',
-    'Vancouver': 'Canada',
-    'Montreal': 'Canada',
-    'Mexico City': 'Mexico',
-    'Cancun': 'Mexico',
-    'Rio de Janeiro': 'Brazil',
-    'Sao Paulo': 'Brazil',
-    'Buenos Aires': 'Argentina',
-    'Lima': 'Peru',
-    'Bogota': 'Colombia',
-    'Santiago': 'Chile',
-
-    // Australia & Pacific
-    'Sydney': 'Australia',
-    'Melbourne': 'Australia',
-    'Brisbane': 'Australia',
-    'Perth': 'Australia',
-    'Auckland': 'New Zealand',
-    'Wellington': 'New Zealand',
-    'Fiji': 'Fiji',
-    'Bora Bora': 'French Polynesia',
-    'Tahiti': 'French Polynesia',
-
-    // Middle East
-    'Abu Dhabi': 'United Arab Emirates',
-    'Doha': 'Qatar',
-    'Riyadh': 'Saudi Arabia',
-    'Tel Aviv': 'Israel',
-    'Jerusalem': 'Israel',
-    'Cairo': 'Egypt',
-
-    // Africa
-    'Cape Town': 'South Africa',
-    'Johannesburg': 'South Africa',
-    'Nairobi': 'Kenya',
-    'Marrakech': 'Morocco',
-    'Casablanca': 'Morocco',
-    'Cairo': 'Egypt',
-    'Luxor': 'Egypt'
-};
-
-function updateFlag(countryName) {
-    const flagInput = document.getElementById('flag');
-    if (countryEmojis[countryName]) {
-        flagInput.value = countryEmojis[countryName];
-    }
-}
-
-function updateCountryAndFlag(city) {
+function updateFlag() {
     const countryInput = document.getElementById('country');
     const flagInput = document.getElementById('flag');
-    const flagPicker = document.getElementById('flagPicker');
-    
-    // Normalize city name (capitalize first letter of each word)
-    city = city.split(' ')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-        .join(' ');
-
-    if (cityToCountry[city]) {
-        const country = cityToCountry[city];
-        countryInput.value = country;
-        
-        // Update flag if country exists in our emoji list
-        if (countryEmojis[country]) {
-            flagInput.value = countryEmojis[country];
-            flagPicker.value = country;
-        }
+    const selectedCountry = countryInput.value;
+    const flag = countryEmojis[selectedCountry];
+    if (flag) {
+        flagInput.value = flag;
     }
-}
-
-function filterCountries(searchText) {
-    const flagPicker = document.getElementById('flagPicker');
-    const searchValue = searchText.toLowerCase();
-    
-    // Reset options
-    flagPicker.innerHTML = '<option value="">Select country</option>';
-    
-    // Filter and add matching countries
-    Object.entries(countryEmojis)
-        .filter(([country]) => country.toLowerCase().includes(searchValue))
-        .forEach(([country, flag]) => {
-            const option = document.createElement('option');
-            option.value = country;
-            option.textContent = `${flag} ${country}`;
-            flagPicker.appendChild(option);
-        });
 }
 
 document.querySelector('#app').innerHTML = `
@@ -622,30 +318,21 @@ document.querySelector('#app').innerHTML = `
 
         <div class="form-group">
           <label for="destination">To:</label>
-          <input type="text" id="destination" name="destination" required 
-                 oninput="updateCountryAndFlag(this.value)" 
-                 placeholder="Enter city name">
+          <input type="text" id="destination" name="destination" required>
         </div>
 
         <div class="form-group">
           <label for="country">To (country):</label>
-          <input type="text" id="country" name="country" required>
+          <input type="text" id="country" name="country" list="countryList" onchange="updateFlag()" required>
+          <datalist id="countryList">
+            ${Object.keys(countryEmojis).map(country => `<option value="${country}">`).join('')}
+          </datalist>
         </div>
 
         <div class="form-group">
           <label for="flag">To (country emoji):</label>
-          <div class="flag-input-group">
-            <input type="text" id="flag" name="flag" placeholder="e.g. 🇫🇷">
-            <div class="flag-picker-container">
-              <input type="text" id="countrySearch" placeholder="Search country..." class="country-search">
-              <select id="flagPicker" onchange="updateFlag(this.value)" class="flag-picker">
-                <option value="">Select country</option>
-                ${Object.entries(countryEmojis).map(([country, flag]) => 
-                  `<option value="${country}">${flag} ${country}</option>`
-                ).join('')}
-              </select>
-            </div>
-          </div>
+          <input type="text" id="flag" name="flag" placeholder="🏳️" readonly>
+          <div class="field-help">Flag will be automatically set based on the selected country</div>
         </div>
 
         <div class="form-group">
@@ -733,15 +420,6 @@ document.querySelector('#app').innerHTML = `
     <div id="dealsList" class="deals-list"></div>
   </div>
 `
-
-document.getElementById('countrySearch')?.addEventListener('input', (e) => filterCountries(e.target.value));
-
-// Make functions available globally
-window.editDeal = editDeal;
-window.deleteDeal = deleteDeal;
-window.updateFlag = updateFlag;
-window.filterCountries = filterCountries;
-window.updateCountryAndFlag = updateCountryAndFlag;
 
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', async () => {
