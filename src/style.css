@@ -64,20 +64,6 @@ h1 {
   border-color: #3498db;
 }
 
-input[list="country-emojis"] {
-  cursor: pointer;
-  font-size: 1.2rem;
-}
-
-input[list="country-emojis"]::-webkit-calendar-picker-indicator {
-  cursor: pointer;
-  opacity: 0.6;
-}
-
-input[list="country-emojis"]::-webkit-calendar-picker-indicator:hover {
-  opacity: 1;
-}
-
 .checkbox-group {
   display: flex;
   align-items: center;

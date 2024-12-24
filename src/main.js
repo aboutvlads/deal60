@@ -9,106 +9,6 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 let isEditing = false;
 let editingId = null;
 
-const countryEmojis = {
-    "🇺🇸 USA": "🇺🇸",
-    "🇬🇧 UK": "🇬🇧",
-    "🇫🇷 France": "🇫🇷",
-    "🇩🇪 Germany": "🇩🇪",
-    "🇮🇹 Italy": "🇮🇹",
-    "🇪🇸 Spain": "🇪🇸",
-    "🇵🇹 Portugal": "🇵🇹",
-    "🇳🇱 Netherlands": "🇳🇱",
-    "🇧🇪 Belgium": "🇧🇪",
-    "🇨🇭 Switzerland": "🇨🇭",
-    "🇦🇹 Austria": "🇦🇹",
-    "🇸🇪 Sweden": "🇸🇪",
-    "🇳🇴 Norway": "🇳🇴",
-    "🇩🇰 Denmark": "🇩🇰",
-    "🇫🇮 Finland": "🇫🇮",
-    "🇮🇪 Ireland": "🇮🇪",
-    "🇬🇷 Greece": "🇬🇷",
-    "🇹🇷 Turkey": "🇹🇷",
-    "🇦🇪 UAE": "🇦🇪",
-    "🇯🇵 Japan": "🇯🇵",
-    "🇰🇷 South Korea": "🇰🇷",
-    "🇨🇳 China": "🇨🇳",
-    "🇭🇰 Hong Kong": "🇭🇰",
-    "🇸🇬 Singapore": "🇸🇬",
-    "🇹🇭 Thailand": "🇹🇭",
-    "🇻🇳 Vietnam": "🇻🇳",
-    "🇮🇳 India": "🇮🇳",
-    "🇦🇺 Australia": "🇦🇺",
-    "🇳🇿 New Zealand": "🇳🇿",
-    "🇨🇦 Canada": "🇨🇦",
-    "🇲🇽 Mexico": "🇲🇽",
-    "🇧🇷 Brazil": "🇧🇷",
-    "🇦🇷 Argentina": "🇦🇷",
-    "🇨🇱 Chile": "🇨🇱",
-    "🇿🇦 South Africa": "🇿🇦",
-    "🇪🇬 Egypt": "🇪🇬",
-    "🇲🇦 Morocco": "🇲🇦"
-};
-
-const cityToCountry = {
-    // Europe
-    'London': { country: 'United Kingdom', flag: '🇬🇧' },
-    'Paris': { country: 'France', flag: '🇫🇷' },
-    'Berlin': { country: 'Germany', flag: '🇩🇪' },
-    'Rome': { country: 'Italy', flag: '🇮🇹' },
-    'Madrid': { country: 'Spain', flag: '🇪🇸' },
-    'Barcelona': { country: 'Spain', flag: '🇪🇸' },
-    'Amsterdam': { country: 'Netherlands', flag: '🇳🇱' },
-    'Brussels': { country: 'Belgium', flag: '🇧🇪' },
-    'Zurich': { country: 'Switzerland', flag: '🇨🇭' },
-    'Vienna': { country: 'Austria', flag: '🇦🇹' },
-    'Stockholm': { country: 'Sweden', flag: '🇸🇪' },
-    'Oslo': { country: 'Norway', flag: '🇳🇴' },
-    'Copenhagen': { country: 'Denmark', flag: '🇩🇰' },
-    'Helsinki': { country: 'Finland', flag: '🇫🇮' },
-    'Dublin': { country: 'Ireland', flag: '🇮🇪' },
-    'Athens': { country: 'Greece', flag: '🇬🇷' },
-    'Istanbul': { country: 'Turkey', flag: '🇹🇷' },
-    'Lisbon': { country: 'Portugal', flag: '🇵🇹' },
-
-    // Asia
-    'Dubai': { country: 'UAE', flag: '🇦🇪' },
-    'Tokyo': { country: 'Japan', flag: '🇯🇵' },
-    'Seoul': { country: 'South Korea', flag: '🇰🇷' },
-    'Beijing': { country: 'China', flag: '🇨🇳' },
-    'Shanghai': { country: 'China', flag: '🇨🇳' },
-    'Hong Kong': { country: 'Hong Kong', flag: '🇭🇰' },
-    'Singapore': { country: 'Singapore', flag: '🇸🇬' },
-    'Bangkok': { country: 'Thailand', flag: '🇹🇭' },
-    'Hanoi': { country: 'Vietnam', flag: '🇻🇳' },
-    'Mumbai': { country: 'India', flag: '🇮🇳' },
-    'Delhi': { country: 'India', flag: '🇮🇳' },
-
-    // Oceania
-    'Sydney': { country: 'Australia', flag: '🇦🇺' },
-    'Melbourne': { country: 'Australia', flag: '🇦🇺' },
-    'Auckland': { country: 'New Zealand', flag: '🇳🇿' },
-
-    // North America
-    'New York': { country: 'USA', flag: '🇺🇸' },
-    'Los Angeles': { country: 'USA', flag: '🇺🇸' },
-    'Chicago': { country: 'USA', flag: '🇺🇸' },
-    'Miami': { country: 'USA', flag: '🇺🇸' },
-    'Toronto': { country: 'Canada', flag: '🇨🇦' },
-    'Vancouver': { country: 'Canada', flag: '🇨🇦' },
-    'Mexico City': { country: 'Mexico', flag: '🇲🇽' },
-
-    // South America
-    'Rio de Janeiro': { country: 'Brazil', flag: '🇧🇷' },
-    'São Paulo': { country: 'Brazil', flag: '🇧🇷' },
-    'Buenos Aires': { country: 'Argentina', flag: '🇦🇷' },
-    'Santiago': { country: 'Chile', flag: '🇨🇱' },
-
-    // Africa
-    'Cape Town': { country: 'South Africa', flag: '🇿🇦' },
-    'Cairo': { country: 'Egypt', flag: '🇪🇬' },
-    'Casablanca': { country: 'Morocco', flag: '🇲🇦' }
-};
-
 function generateUUID() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         const r = Math.random() * 16 | 0
@@ -150,6 +50,7 @@ const prefillData = {
     stops: 'Non-stop',
     price: 499,
     original_price: 899,
+    discount: 400,
     posted_by: 'System',
     posted_by_avatar: 'https://example.com/avatar.jpg',
     posted_by_description: 'Deal Hunter',
@@ -314,9 +215,6 @@ async function initializeForm() {
 
         try {
             const formData = new FormData(e.target)
-            const price = parseInt(formData.get('price'))
-            const originalPrice = parseInt(formData.get('original_price'))
-            
             const data = {
                 id: formData.get('id'),
                 departure: formData.get('departure'),
@@ -324,9 +222,9 @@ async function initializeForm() {
                 country: formData.get('country'),
                 flag: formData.get('flag'),
                 stops: formData.get('stops'),
-                price: price,
-                original_price: originalPrice,
-                discount: originalPrice - price, // Calculate discount automatically
+                price: parseInt(formData.get('price')),
+                original_price: parseInt(formData.get('original_price')),
+                discount: parseInt(formData.get('discount')),
                 posted_by: formData.get('posted_by'),
                 posted_by_avatar: formData.get('posted_by_avatar'),
                 posted_by_description: formData.get('posted_by_description'),
@@ -367,33 +265,6 @@ async function initializeForm() {
     })
 }
 
-function initializeAutofill() {
-    const destinationInput = document.getElementById('destination');
-    const countryInput = document.getElementById('country');
-    const flagInput = document.getElementById('flag');
-
-    destinationInput.addEventListener('input', (e) => {
-        const city = e.target.value.trim();
-        const cityInfo = cityToCountry[city];
-        
-        if (cityInfo) {
-            countryInput.value = cityInfo.country;
-            flagInput.value = cityInfo.flag;
-        }
-    });
-
-    // Also add autocomplete for cities
-    const datalist = document.createElement('datalist');
-    datalist.id = 'city-suggestions';
-    Object.keys(cityToCountry).forEach(city => {
-        const option = document.createElement('option');
-        option.value = city;
-        datalist.appendChild(option);
-    });
-    document.body.appendChild(datalist);
-    destinationInput.setAttribute('list', 'city-suggestions');
-}
-
 // Make functions available globally for onclick handlers
 window.editDeal = editDeal;
 window.deleteDeal = deleteDeal;
@@ -423,12 +294,7 @@ document.querySelector('#app').innerHTML = `
 
         <div class="form-group">
           <label for="flag">To (country emoji):</label>
-          <input type="text" id="flag" name="flag" list="country-emojis" placeholder="Click to select country flag">
-          <datalist id="country-emojis">
-            ${Object.entries(countryEmojis).map(([label, emoji]) => `
-              <option value="${emoji}">${label}</option>
-            `).join('')}
-          </datalist>
+          <input type="text" id="flag" name="flag" placeholder="e.g. 🇫🇷">
         </div>
 
         <div class="form-group">
@@ -437,13 +303,18 @@ document.querySelector('#app').innerHTML = `
         </div>
 
         <div class="form-group">
-          <label for="price">Price:</label>
+          <label for="price">Discount price:</label>
           <input type="number" id="price" name="price" required>
         </div>
 
         <div class="form-group">
           <label for="original_price">Original price:</label>
           <input type="number" id="original_price" name="original_price" required>
+        </div>
+
+        <div class="form-group">
+          <label for="discount">Discount:</label>
+          <input type="number" id="discount" name="discount" required>
         </div>
 
         <div class="form-group">
@@ -515,13 +386,11 @@ document.querySelector('#app').innerHTML = `
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', async () => {
         await initializeForm()
-        initializeAutofill()
         prefillForm()
         displayDeals()
     })
 } else {
     initializeForm()
-    initializeAutofill()
     prefillForm()
     displayDeals()
 }
