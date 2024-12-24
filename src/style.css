@@ -64,17 +64,6 @@ h1 {
   border-color: #3498db;
 }
 
-.field-help {
-  font-size: 0.8rem;
-  color: #666;
-  margin-top: 0.25rem;
-}
-
-input[readonly] {
-  background-color: #f8f9fa;
-  cursor: not-allowed;
-}
-
 .checkbox-group {
   display: flex;
   align-items: center;
