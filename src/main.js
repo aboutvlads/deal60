@@ -299,11 +299,7 @@ document.querySelector('#app').innerHTML = `
 
         <div class="form-group">
           <label for="stops">Travel Dates • Stops:</label>
-          <select id="stops" name="stops" required>
-            <option value="Non-stop">Non-stop</option>
-            <option value="1 Stop">1 Stop</option>
-            <option value="2+ Stops">2+ Stops</option>
-          </select>
+          <input type="text" id="stops" name="stops" placeholder="e.g. Jan 15-22 • Non-stop" required>
         </div>
 
         <div class="form-group">
