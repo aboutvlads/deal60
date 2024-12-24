@@ -49,6 +49,66 @@ const countryEmojis = {
     "🇲🇦 Morocco": "🇲🇦"
 };
 
+const cityToCountry = {
+    // Europe
+    'London': { country: 'United Kingdom', flag: '🇬🇧' },
+    'Paris': { country: 'France', flag: '🇫🇷' },
+    'Berlin': { country: 'Germany', flag: '🇩🇪' },
+    'Rome': { country: 'Italy', flag: '🇮🇹' },
+    'Madrid': { country: 'Spain', flag: '🇪🇸' },
+    'Barcelona': { country: 'Spain', flag: '🇪🇸' },
+    'Amsterdam': { country: 'Netherlands', flag: '🇳🇱' },
+    'Brussels': { country: 'Belgium', flag: '🇧🇪' },
+    'Zurich': { country: 'Switzerland', flag: '🇨🇭' },
+    'Vienna': { country: 'Austria', flag: '🇦🇹' },
+    'Stockholm': { country: 'Sweden', flag: '🇸🇪' },
+    'Oslo': { country: 'Norway', flag: '🇳🇴' },
+    'Copenhagen': { country: 'Denmark', flag: '🇩🇰' },
+    'Helsinki': { country: 'Finland', flag: '🇫🇮' },
+    'Dublin': { country: 'Ireland', flag: '🇮🇪' },
+    'Athens': { country: 'Greece', flag: '🇬🇷' },
+    'Istanbul': { country: 'Turkey', flag: '🇹🇷' },
+    'Lisbon': { country: 'Portugal', flag: '🇵🇹' },
+
+    // Asia
+    'Dubai': { country: 'UAE', flag: '🇦🇪' },
+    'Tokyo': { country: 'Japan', flag: '🇯🇵' },
+    'Seoul': { country: 'South Korea', flag: '🇰🇷' },
+    'Beijing': { country: 'China', flag: '🇨🇳' },
+    'Shanghai': { country: 'China', flag: '🇨🇳' },
+    'Hong Kong': { country: 'Hong Kong', flag: '🇭🇰' },
+    'Singapore': { country: 'Singapore', flag: '🇸🇬' },
+    'Bangkok': { country: 'Thailand', flag: '🇹🇭' },
+    'Hanoi': { country: 'Vietnam', flag: '🇻🇳' },
+    'Mumbai': { country: 'India', flag: '🇮🇳' },
+    'Delhi': { country: 'India', flag: '🇮🇳' },
+
+    // Oceania
+    'Sydney': { country: 'Australia', flag: '🇦🇺' },
+    'Melbourne': { country: 'Australia', flag: '🇦🇺' },
+    'Auckland': { country: 'New Zealand', flag: '🇳🇿' },
+
+    // North America
+    'New York': { country: 'USA', flag: '🇺🇸' },
+    'Los Angeles': { country: 'USA', flag: '🇺🇸' },
+    'Chicago': { country: 'USA', flag: '🇺🇸' },
+    'Miami': { country: 'USA', flag: '🇺🇸' },
+    'Toronto': { country: 'Canada', flag: '🇨🇦' },
+    'Vancouver': { country: 'Canada', flag: '🇨🇦' },
+    'Mexico City': { country: 'Mexico', flag: '🇲🇽' },
+
+    // South America
+    'Rio de Janeiro': { country: 'Brazil', flag: '🇧🇷' },
+    'São Paulo': { country: 'Brazil', flag: '🇧🇷' },
+    'Buenos Aires': { country: 'Argentina', flag: '🇦🇷' },
+    'Santiago': { country: 'Chile', flag: '🇨🇱' },
+
+    // Africa
+    'Cape Town': { country: 'South Africa', flag: '🇿🇦' },
+    'Cairo': { country: 'Egypt', flag: '🇪🇬' },
+    'Casablanca': { country: 'Morocco', flag: '🇲🇦' }
+};
+
 function generateUUID() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         const r = Math.random() * 16 | 0
@@ -303,6 +363,33 @@ async function initializeForm() {
     })
 }
 
+function initializeAutofill() {
+    const destinationInput = document.getElementById('destination');
+    const countryInput = document.getElementById('country');
+    const flagInput = document.getElementById('flag');
+
+    destinationInput.addEventListener('input', (e) => {
+        const city = e.target.value.trim();
+        const cityInfo = cityToCountry[city];
+        
+        if (cityInfo) {
+            countryInput.value = cityInfo.country;
+            flagInput.value = cityInfo.flag;
+        }
+    });
+
+    // Also add autocomplete for cities
+    const datalist = document.createElement('datalist');
+    datalist.id = 'city-suggestions';
+    Object.keys(cityToCountry).forEach(city => {
+        const option = document.createElement('option');
+        option.value = city;
+        datalist.appendChild(option);
+    });
+    document.body.appendChild(datalist);
+    destinationInput.setAttribute('list', 'city-suggestions');
+}
+
 // Make functions available globally for onclick handlers
 window.editDeal = editDeal;
 window.deleteDeal = deleteDeal;
@@ -424,11 +511,13 @@ document.querySelector('#app').innerHTML = `
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', async () => {
         await initializeForm()
+        initializeAutofill()
         prefillForm()
         displayDeals()
     })
 } else {
     initializeForm()
+    initializeAutofill()
     prefillForm()
     displayDeals()
 }
