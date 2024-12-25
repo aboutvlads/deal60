@@ -460,6 +460,23 @@ async function initializeForm() {
     await signInWithEmail()
     setupCountrySearch()
 
+    // Setup screenshot preview
+    const screenshotInput = document.getElementById('deal_screenshot')
+    const previewDiv = screenshotInput.nextElementSibling
+    
+    screenshotInput.addEventListener('change', (e) => {
+        const file = e.target.files[0]
+        if (file) {
+            const reader = new FileReader()
+            reader.onload = (e) => {
+                previewDiv.innerHTML = `<img src="${e.target.result}" alt="Screenshot preview">`
+            }
+            reader.readAsDataURL(file)
+        } else {
+            previewDiv.innerHTML = ''
+        }
+    })
+
     form.addEventListener('submit', async (e) => {
         e.preventDefault()
         form.classList.add('loading')
@@ -469,6 +486,28 @@ async function initializeForm() {
             const travelPeriod = formData.get('travel_period')
             const travelStops = formData.get('travel_stops')
             const combinedStops = `${travelPeriod} • ${travelStops}`
+
+            // Handle screenshot upload
+            const screenshotFile = formData.get('deal_screenshot')
+            let deal_screenshot_url = null
+
+            if (screenshotFile && screenshotFile.size > 0) {
+                const timestamp = new Date().getTime()
+                const fileExt = screenshotFile.name.split('.').pop()
+                const filePath = `${timestamp}-${Math.random().toString(36).substring(7)}.${fileExt}`
+
+                const { data: uploadData, error: uploadError } = await supabase.storage
+                    .from('screenshots')
+                    .upload(filePath, screenshotFile)
+
+                if (uploadError) throw uploadError
+
+                const { data: { publicUrl } } = supabase.storage
+                    .from('screenshots')
+                    .getPublicUrl(filePath)
+
+                deal_screenshot_url = publicUrl
+            }
 
             const data = {
                 id: formData.get('id'),
@@ -487,7 +526,7 @@ async function initializeForm() {
                 image_url: formData.get('image_url'),
                 is_hot: formData.get('is_hot') === 'on',
                 sample_dates: formData.get('sample_dates'),
-                deal_screenshot_url: formData.get('deal_screenshot_url')
+                deal_screenshot_url
             }
 
             let error;
@@ -557,7 +596,11 @@ document.querySelector('#app').innerHTML = `
 
         <div class="form-group">
           <label for="travel_stops">Stops:</label>
-          <input type="text" id="travel_stops" name="travel_stops" placeholder="e.g. Direct" required>
+          <select id="travel_stops" name="travel_stops" required>
+            <option value="Direct">Direct</option>
+            <option value="1 Stop">1 Stop</option>
+            <option value="2+ Stops">2+ Stops</option>
+          </select>
         </div>
 
         <div class="form-group">
@@ -591,31 +634,6 @@ document.querySelector('#app').innerHTML = `
         </div>
 
         <div class="form-group">
-          <label for="type">Cabin Type:</label>
-          <select id="type" name="type" required>
-            <option value="Economy">Economy</option>
-            <option value="Premium Economy">Premium Economy</option>
-            <option value="Business">Business</option>
-            <option value="First">First</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="departure_time">Departure Time:</label>
-          <input type="time" id="departure_time" name="departure_time" required>
-        </div>
-
-        <div class="form-group">
-          <label for="arrival_time">Arrival Time:</label>
-          <input type="time" id="arrival_time" name="arrival_time" required>
-        </div>
-
-        <div class="form-group">
-          <label for="flight_duration">Flight Duration:</label>
-          <input type="text" id="flight_duration" name="flight_duration" placeholder="e.g. 2h 30m" required>
-        </div>
-
-        <div class="form-group">
           <label for="url">URL:</label>
           <input type="url" id="url" name="url" required>
         </div>
@@ -627,12 +645,13 @@ document.querySelector('#app').innerHTML = `
 
         <div class="form-group">
           <label for="sample_dates">Sample Dates:</label>
-          <input type="text" id="sample_dates" name="sample_dates" required>
+          <textarea id="sample_dates" name="sample_dates" rows="3" required></textarea>
         </div>
 
         <div class="form-group">
-          <label for="deal_screenshot_url">Deal Screenshot URL:</label>
-          <input type="url" id="deal_screenshot_url" name="deal_screenshot_url" required>
+          <label for="deal_screenshot">Deal Screenshot:</label>
+          <input type="file" id="deal_screenshot" name="deal_screenshot" accept="image/*" required>
+          <div class="upload-preview"></div>
         </div>
 
         <div class="form-group checkbox-group">
@@ -678,6 +697,27 @@ style.textContent = `
 
     .form-group {
         position: relative;
+        margin-bottom: 15px;
+    }
+
+    textarea#sample_dates {
+        width: 100%;
+        min-height: 80px;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        resize: vertical;
+    }
+
+    .upload-preview {
+        margin-top: 10px;
+        max-width: 300px;
+    }
+
+    .upload-preview img {
+        max-width: 100%;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 `;
 document.head.appendChild(style);
