@@ -458,7 +458,7 @@ const prefillData = {
     destination: 'Paris',
     country: '',
     flag: '',
-    travel_stops: 'Non-stop',
+    travel_stops: 'Direct',
     price: 299,
     original_price: 599,
     posted_by: '',
@@ -689,9 +689,9 @@ document.querySelector('#app').innerHTML = `
         <div class="form-group">
           <label for="travel_stops">Stops:</label>
           <select id="travel_stops" name="travel_stops" required>
-            <option value="Non-stop">Non-stop</option>
-            <option value="1 stop">1 stop</option>
-            <option value="2+ stops">2+ stops</option>
+            <option value="Direct">Direct</option>
+            <option value="1 Stop">1 Stop</option>
+            <option value="2+ Stops">2+ Stops</option>
           </select>
         </div>
 
