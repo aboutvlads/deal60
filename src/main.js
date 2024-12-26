@@ -250,15 +250,22 @@ async function uploadScreenshot(file) {
     try {
         const timestamp = new Date().getTime();
         const fileExt = file.name.split('.').pop();
-        const filePath = `${timestamp}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+        const filePath = `public/${timestamp}-${Math.random().toString(36).substring(7)}.${fileExt}`;
 
-        const { data: uploadData, error: uploadError } = await supabase.storage
+        // Create anonymous Supabase client
+        const anonymousClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const { data: uploadData, error: uploadError } = await anonymousClient.storage
             .from('screenshots')
-            .upload(filePath, file);
+            .upload(filePath, file, {
+                cacheControl: '3600',
+                upsert: false,
+                contentType: file.type
+            });
 
         if (uploadError) throw uploadError;
 
-        const { data: { publicUrl } } = supabase.storage
+        const { data: { publicUrl } } = anonymousClient.storage
             .from('screenshots')
             .getPublicUrl(filePath);
 
@@ -565,7 +572,8 @@ async function initializeForm() {
     const form = document.getElementById('dealForm')
     if (!form) return
 
-    await signInWithEmail()
+    // Remove the authentication requirement
+    // await signInWithEmail()
     setupCountrySearch()
     setupPostedByDropdown()
 
