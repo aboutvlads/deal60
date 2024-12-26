@@ -464,14 +464,10 @@ async function initializeForm() {
     const screenshotInput = document.getElementById('deal_screenshot')
     const previewDiv = screenshotInput.nextElementSibling
     
-    screenshotInput.addEventListener('change', (e) => {
-        const file = e.target.files[0]
-        if (file) {
-            const reader = new FileReader()
-            reader.onload = (e) => {
-                previewDiv.innerHTML = `<img src="${e.target.result}" alt="Screenshot preview">`
-            }
-            reader.readAsDataURL(file)
+    screenshotInput.addEventListener('input', (e) => {
+        const url = e.target.value
+        if (url) {
+            previewDiv.innerHTML = `<img src="${url}" alt="Screenshot preview" onerror="this.src=''; this.alt='Invalid image URL'">`
         } else {
             previewDiv.innerHTML = ''
         }
@@ -487,27 +483,8 @@ async function initializeForm() {
             const travelStops = formData.get('travel_stops')
             const combinedStops = `${travelPeriod} • ${travelStops}`
 
-            // Handle screenshot upload
-            const screenshotFile = formData.get('deal_screenshot')
-            let deal_screenshot_url = null
-
-            if (screenshotFile && screenshotFile.size > 0) {
-                const timestamp = new Date().getTime()
-                const fileExt = screenshotFile.name.split('.').pop()
-                const filePath = `${timestamp}-${Math.random().toString(36).substring(7)}.${fileExt}`
-
-                const { data: uploadData, error: uploadError } = await supabase.storage
-                    .from('screenshots')
-                    .upload(filePath, screenshotFile)
-
-                if (uploadError) throw uploadError
-
-                const { data: { publicUrl } } = supabase.storage
-                    .from('screenshots')
-                    .getPublicUrl(filePath)
-
-                deal_screenshot_url = publicUrl
-            }
+            // Get screenshot URL directly
+            const deal_screenshot_url = formData.get('deal_screenshot')
 
             const data = {
                 id: formData.get('id'),
@@ -649,8 +626,8 @@ document.querySelector('#app').innerHTML = `
         </div>
 
         <div class="form-group">
-          <label for="deal_screenshot">Deal Screenshot:</label>
-          <input type="file" id="deal_screenshot" name="deal_screenshot" accept="image/*" required>
+          <label for="deal_screenshot">Deal Screenshot URL:</label>
+          <input type="url" id="deal_screenshot" name="deal_screenshot" required>
           <div class="upload-preview"></div>
         </div>
 
