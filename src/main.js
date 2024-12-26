@@ -403,49 +403,23 @@ const prefillData = {
     id: generateUUID(),
     departure: 'New York',
     destination: 'Paris',
-    country: 'France',
-    flag: '🇫🇷',
-    stops: '2024 • Direct',
-    price: 399,
-    original_price: 899,
-    discount: 56,
-    posted_by: 'Vlad',
-    posted_by_avatar: 'https://pbs.twimg.com/profile_images/1861513689720881152/86GYfxoC_400x400.jpg',
-    posted_by_description: 'Deal Hunter',
+    country: '',
+    flag: '',
+    travel_period: '2h 30m',
+    travel_stops: 'Non-stop',
+    price: 299,
+    original_price: 599,
+    discount: 50,
+    posted_by: '',
+    posted_by_avatar: '',
+    posted_by_description: '',
     url: 'https://example.com',
     image_url: '',
     is_hot: false,
-    sample_dates: 'Jan 15 - Feb 28',
+    sample_dates: '',
     deal_screenshot_url: '',
-    trip_type: 'roundtrip',  // Add default trip type
-    dates: 'Multiple dates available'  // Add default dates
-}
-
-function prefillForm(data = prefillData) {
-    const form = document.getElementById('dealForm')
-    if (!form) return
-
-    // Set values for existing fields
-    form.querySelector('#id').value = data.id
-    form.querySelector('#departure').value = data.departure
-    form.querySelector('#destination').value = data.destination
-    form.querySelector('#country').value = data.country
-    form.querySelector('#flag').value = data.flag
-    form.querySelector('#travel_period').value = data.stops.split(' • ')[0]
-    form.querySelector('#travel_stops').value = data.stops.split(' • ')[1]
-    form.querySelector('#price').value = data.price
-    form.querySelector('#original_price').value = data.original_price
-    form.querySelector('#discount').value = data.discount
-    form.querySelector('#posted_by').value = data.posted_by
-    form.querySelector('#posted_by_avatar').value = data.posted_by_avatar
-    form.querySelector('#posted_by_description').value = data.posted_by_description
-    form.querySelector('#url').value = data.url
-    form.querySelector('#image_url').value = data.image_url
-    form.querySelector('#is_hot').checked = data.is_hot
-    form.querySelector('#sample_dates').value = data.sample_dates
-    form.querySelector('#deal_screenshot').value = data.deal_screenshot_url
-    form.querySelector('#trip_type').value = data.trip_type  // Add trip type
-    form.querySelector('#dates').value = data.dates  // Add dates
+    trip_type: 'roundtrip',
+    dates: ''
 }
 
 async function initializeForm() {
@@ -456,6 +430,30 @@ async function initializeForm() {
     // await signInWithEmail()
     setupCountrySearch()
     setupPostedByDropdown()
+
+    // Add trip type selection field
+    const tripTypeField = document.createElement('div');
+    tripTypeField.className = 'form-group';
+    tripTypeField.innerHTML = `
+        <label for="trip_type">Trip Type:</label>
+        <select id="trip_type" name="trip_type" required>
+            <option value="roundtrip">Round Trip</option>
+            <option value="oneway">One Way</option>
+        </select>
+    `;
+
+    // Add dates field
+    const datesField = document.createElement('div');
+    datesField.className = 'form-group';
+    datesField.innerHTML = `
+        <label for="dates">Dates:</label>
+        <input type="text" id="dates" name="dates" placeholder="e.g., Jan 15 - Jan 22, 2024" required>
+    `;
+
+    // Insert new fields after the destination field
+    const destinationField = document.getElementById('destination').parentNode;
+    destinationField.parentNode.insertBefore(tripTypeField, destinationField.nextSibling);
+    destinationField.parentNode.insertBefore(datesField, tripTypeField.nextSibling);
 
     // Setup screenshot upload and URL input
     const screenshotInput = document.getElementById('deal_screenshot');
@@ -602,8 +600,8 @@ async function initializeForm() {
                 is_hot: formData.get('is_hot') === 'on',
                 sample_dates: formData.get('sample_dates'),
                 deal_screenshot_url,
-                trip_type: formData.get('trip_type'),  // Add trip type
-                dates: formData.get('dates')  // Add dates
+                trip_type: formData.get('trip_type'),
+                dates: formData.get('dates')
             }
 
             let error;
@@ -734,14 +732,14 @@ document.querySelector('#app').innerHTML = `
         <div class="form-group">
           <label for="trip_type">Trip Type:</label>
           <select id="trip_type" name="trip_type" required>
-            <option value="roundtrip">Roundtrip</option>
-            <option value="oneway">One-way</option>
+            <option value="roundtrip">Round Trip</option>
+            <option value="oneway">One Way</option>
           </select>
         </div>
 
         <div class="form-group">
           <label for="dates">Dates:</label>
-          <input type="text" id="dates" name="dates" required>
+          <input type="text" id="dates" name="dates" placeholder="e.g., Jan 15 - Jan 22, 2024" required>
         </div>
 
         <div class="form-group checkbox-group">
@@ -866,9 +864,7 @@ style.textContent = `
         background-color: white;
         font-size: 16px;
     }
-`;
-{{ ... }}
-style.textContent += `
+
     .upload-image-btn {
         margin-left: 8px;
         padding: 8px 12px;
@@ -904,21 +900,26 @@ style.textContent += `
     #deal_screenshot {
         flex: 1;
     }
-`;
 
-// Add the styles to the existing style element
-style.textContent += `
-    .trip-type-select {
+    select#trip_type {
         width: 100%;
         padding: 8px;
-        margin-bottom: 10px;
         border: 1px solid #ddd;
         border-radius: 4px;
         background-color: white;
         font-size: 16px;
     }
+
+    input#dates {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 16px;
+    }
 `;
 
+// Add the styles to the existing style element
 document.head.appendChild(style);
 
 if (document.readyState === 'loading') {
@@ -933,7 +934,7 @@ if (document.readyState === 'loading') {
     displayDeals()
 }
 
-async function formatDate(dateString) {
+function formatDate(dateString) {
     const options = { 
         year: 'numeric', 
         month: 'short', 
@@ -944,7 +945,7 @@ async function formatDate(dateString) {
     return new Date(dateString).toLocaleDateString('en-US', options)
 }
 
-async function formatPrice(price) {
+function formatPrice(price) {
     return new Intl.NumberFormat('de-DE', {
         style: 'currency',
         currency: 'EUR'
@@ -1046,5 +1047,38 @@ async function deleteDeal(id) {
     } catch (error) {
         console.error('Error deleting deal:', error)
         alert('Error deleting deal: ' + error.message)
+    }
+}
+
+function prefillForm(data = prefillData) {
+    const form = document.getElementById('dealForm')
+    if (!form) return
+
+    const formData = { ...data }
+    if (!isEditing) {
+        formData.id = generateUUID()
+    }
+
+    // If we're editing and have a combined stops value, split it
+    if (isEditing && formData.stops) {
+        const [period, stops] = formData.stops.split(' • ');
+        formData.travel_period = period;
+        formData.travel_stops = stops;
+    }
+
+    Object.entries(formData).forEach(([key, value]) => {
+        const input = form.elements[key]
+        if (input) {
+            if (input.type === 'checkbox') {
+                input.checked = value
+            } else {
+                input.value = value
+            }
+        }
+    })
+
+    const submitButton = form.querySelector('button[type="submit"]')
+    if (submitButton) {
+        submitButton.textContent = isEditing ? 'Update Deal' : 'Add Deal'
     }
 }
