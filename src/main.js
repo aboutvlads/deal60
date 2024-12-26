@@ -231,24 +231,6 @@ const PREDEFINED_USERS = [
     }
 ];
 
-const AIRPORTS = [
-    { city: 'Amsterdam', code: 'AMS', country: 'Netherlands' },
-    { city: 'London', code: 'LHR', country: 'United Kingdom' },
-    { city: 'Paris', code: 'CDG', country: 'France' },
-    { city: 'New York', code: 'JFK', country: 'United States' },
-    { city: 'Los Angeles', code: 'LAX', country: 'United States' },
-    { city: 'Tokyo', code: 'NRT', country: 'Japan' },
-    { city: 'Dubai', code: 'DXB', country: 'United Arab Emirates' },
-    { city: 'Singapore', code: 'SIN', country: 'Singapore' },
-    { city: 'Hong Kong', code: 'HKG', country: 'Hong Kong' },
-    { city: 'Sydney', code: 'SYD', country: 'Australia' },
-    { city: 'Berlin', code: 'BER', country: 'Germany' },
-    { city: 'Madrid', code: 'MAD', country: 'Spain' },
-    { city: 'Rome', code: 'FCO', country: 'Italy' },
-    { city: 'Bangkok', code: 'BKK', country: 'Thailand' },
-    { city: 'Istanbul', code: 'IST', country: 'Turkey' },
-];
-
 async function fetchUnsplashImages(query) {
     try {
         const response = await fetch(`https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=9`, {
@@ -381,84 +363,6 @@ function setupPostedByDropdown() {
             postedByInput.value = '';
             postedByAvatarInput.value = '';
             postedByDescriptionInput.value = '';
-        }
-    });
-}
-
-function setupDepartureField() {
-    const departureGroup = document.querySelector('.form-group:has(#departure)');
-    if (!departureGroup) return;
-
-    // Clear the existing content
-    departureGroup.innerHTML = `
-        <label for="departure">From:</label>
-        <div class="departure-wrapper">
-            <div class="input-column">
-                <input type="text" class="airport-search" id="departure" placeholder="Enter city name" required>
-                <select class="trip-type-select">
-                    <option value="Roundtrip">Roundtrip</option>
-                    <option value="One Way">One Way</option>
-                </select>
-            </div>
-            <div class="airport-suggestions"></div>
-        </div>
-    `;
-
-    const airportSearch = departureGroup.querySelector('.airport-search');
-    const tripTypeSelect = departureGroup.querySelector('.trip-type-select');
-    const suggestionsDiv = departureGroup.querySelector('.airport-suggestions');
-
-    // Handle airport search
-    airportSearch.addEventListener('input', (e) => {
-        const value = e.target.value.toLowerCase();
-        if (value.length < 2) {
-            suggestionsDiv.style.display = 'none';
-            return;
-        }
-
-        const matches = AIRPORTS.filter(airport => 
-            airport.city.toLowerCase().includes(value) || 
-            airport.code.toLowerCase().includes(value)
-        );
-
-        if (matches.length > 0) {
-            suggestionsDiv.style.display = 'block';
-            suggestionsDiv.innerHTML = matches.map(airport => `
-                <div class="airport-suggestion" data-code="${airport.code}" data-city="${airport.city}">
-                    <span class="airport-code">${airport.code}</span>
-                    <span class="airport-city">${airport.city}</span>
-                    <span class="airport-country">${airport.country}</span>
-                </div>
-            `).join('');
-
-            // Add click handlers to suggestions
-            suggestionsDiv.querySelectorAll('.airport-suggestion').forEach(div => {
-                div.addEventListener('click', () => {
-                    const code = div.dataset.code;
-                    const city = div.dataset.city;
-                    const tripType = tripTypeSelect.value;
-                    
-                    airportSearch.value = `${code}, ${city} (${tripType})`;
-                    suggestionsDiv.style.display = 'none';
-                });
-            });
-        } else {
-            suggestionsDiv.style.display = 'none';
-        }
-    });
-
-    // Update value when trip type changes
-    tripTypeSelect.addEventListener('change', () => {
-        if (airportSearch.value) {
-            const parts = airportSearch.value.split(' (')[0]; // Remove existing trip type if any
-            airportSearch.value = `${parts} (${tripTypeSelect.value})`;
-        }
-    });
-
-    // Close suggestions when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!departureGroup.contains(e.target)) {
-            suggestionsDiv.style.display = 'none';
         }
     });
 }
@@ -672,7 +576,6 @@ async function initializeForm() {
     // await signInWithEmail()
     setupCountrySearch()
     setupPostedByDropdown()
-    setupDepartureField()
 
     // Setup screenshot upload and URL input
     const screenshotInput = document.getElementById('deal_screenshot');
@@ -863,16 +766,7 @@ document.querySelector('#app').innerHTML = `
       <div class="form-grid">
         <div class="form-group">
           <label for="departure">From:</label>
-          <div class="departure-wrapper">
-            <div class="input-column">
-                <input type="text" class="airport-search" id="departure" placeholder="Enter city name" required>
-                <select class="trip-type-select">
-                    <option value="Roundtrip">Roundtrip</option>
-                    <option value="One Way">One Way</option>
-                </select>
-            </div>
-            <div class="airport-suggestions"></div>
-          </div>
+          <input type="text" id="departure" name="departure" required>
         </div>
 
         <div class="form-group">
@@ -1113,172 +1007,44 @@ style.textContent = `
     #deal_screenshot {
         flex: 1;
     }
-
-    .departure-wrapper {
-        position: relative;
-        width: 100%;
-    }
-
-    .input-column {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        width: 100%;
-    }
-
-    .airport-search {
-        width: 100%;
-        padding: 12px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        font-size: 16px;
-    }
-
-    .trip-type-select {
-        width: 100%;
-        max-width: 200px;
-        padding: 12px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        background-color: white;
-        font-size: 16px;
-    }
-
-    .airport-suggestions {
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        background: white;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        max-height: 300px;
-        overflow-y: auto;
-        z-index: 1000;
-        display: none;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        margin-top: 8px;
-    }
-
-    .airport-suggestion {
-        padding: 12px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        border-bottom: 1px solid #eee;
-    }
-
-    .airport-suggestion:last-child {
-        border-bottom: none;
-    }
-
-    .airport-suggestion:hover {
-        background: #f5f5f5;
-    }
-
-    .airport-code {
-        font-weight: bold;
-        color: #666;
-        min-width: 60px;
-    }
-
-    .airport-city {
-        flex: 1;
-        font-size: 16px;
-    }
-
-    .airport-country {
-        color: #888;
-        font-size: 14px;
-        min-width: 100px;
-    }
 `;
 
 // Add the styles to the existing style element
 style.textContent += `
-    .form-group {
-        margin-bottom: 15px;
-    }
-
-    .departure-wrapper {
-        position: relative;
-        width: 100%;
-    }
-
-    .input-column {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        width: 100%;
-    }
-
-    .airport-search {
-        width: 100%;
-        padding: 12px;
+    .upload-image-btn {
+        margin-left: 8px;
+        padding: 8px 12px;
+        background: #f0f0f0;
         border: 1px solid #ddd;
         border-radius: 4px;
-        font-size: 16px;
-    }
-
-    .trip-type-select {
-        width: 100%;
-        max-width: 200px;
-        padding: 12px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        background-color: white;
-        font-size: 16px;
-    }
-
-    .airport-suggestions {
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        background: white;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        max-height: 300px;
-        overflow-y: auto;
-        z-index: 1000;
-        display: none;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        margin-top: 8px;
-    }
-
-    .airport-suggestion {
-        padding: 12px;
         cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .upload-image-btn:hover {
+        background: #e0e0e0;
+    }
+
+    .upload-image-btn:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+
+    .loading-spinner {
+        padding: 20px;
+        text-align: center;
+        color: #666;
+    }
+
+    /* Make URL input and upload button appear on the same line */
+    .form-group {
         display: flex;
         align-items: center;
-        gap: 15px;
-        border-bottom: 1px solid #eee;
+        gap: 8px;
     }
 
-    .airport-suggestion:last-child {
-        border-bottom: none;
-    }
-
-    .airport-suggestion:hover {
-        background: #f5f5f5;
-    }
-
-    .airport-code {
-        font-weight: bold;
-        color: #666;
-        min-width: 60px;
-    }
-
-    .airport-city {
+    #deal_screenshot {
         flex: 1;
-        font-size: 16px;
-    }
-
-    .airport-country {
-        color: #888;
-        font-size: 14px;
-        min-width: 100px;
     }
 `;
 
