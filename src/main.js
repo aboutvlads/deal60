@@ -431,30 +431,6 @@ async function initializeForm() {
     setupCountrySearch()
     setupPostedByDropdown()
 
-    // Add trip type selection field
-    const tripTypeField = document.createElement('div');
-    tripTypeField.className = 'form-group';
-    tripTypeField.innerHTML = `
-        <label for="trip_type">Trip Type:</label>
-        <select id="trip_type" name="trip_type" required>
-            <option value="roundtrip">Round Trip</option>
-            <option value="oneway">One Way</option>
-        </select>
-    `;
-
-    // Add dates field
-    const datesField = document.createElement('div');
-    datesField.className = 'form-group';
-    datesField.innerHTML = `
-        <label for="dates">Dates:</label>
-        <input type="text" id="dates" name="dates" placeholder="e.g., Jan 15 - Jan 22, 2024" required>
-    `;
-
-    // Insert new fields after the destination field
-    const destinationField = document.getElementById('destination').parentNode;
-    destinationField.parentNode.insertBefore(tripTypeField, destinationField.nextSibling);
-    destinationField.parentNode.insertBefore(datesField, tripTypeField.nextSibling);
-
     // Setup screenshot upload and URL input
     const screenshotInput = document.getElementById('deal_screenshot');
     const previewDiv = screenshotInput.nextElementSibling;
