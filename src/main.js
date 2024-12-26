@@ -406,9 +406,9 @@ const prefillData = {
     country: 'France',
     flag: '🇫🇷',
     stops: '2024 • Direct',
-    price: 299,
-    original_price: 599,
-    discount: 50,
+    price: 399,
+    original_price: 899,
+    discount: 56,
     posted_by: 'Vlad',
     posted_by_avatar: 'https://pbs.twimg.com/profile_images/1861513689720881152/86GYfxoC_400x400.jpg',
     posted_by_description: 'Deal Hunter',
@@ -418,156 +418,34 @@ const prefillData = {
     sample_dates: 'Jan 15 - Feb 28',
     deal_screenshot_url: '',
     trip_type: 'roundtrip',  // Add default trip type
-    dates: 'Available: Jan-Mar 2024'  // Add default dates
+    dates: 'Multiple dates available'  // Add default dates
 }
 
 function prefillForm(data = prefillData) {
     const form = document.getElementById('dealForm')
     if (!form) return
 
-    const formData = { ...data }
-    if (!isEditing) {
-        formData.id = generateUUID()
-    }
-
-    // If we're editing and have a combined stops value, split it
-    if (isEditing && formData.stops) {
-        const [period, stops] = formData.stops.split(' • ');
-        formData.travel_period = period;
-        formData.travel_stops = stops;
-    }
-
-    Object.entries(formData).forEach(([key, value]) => {
-        const input = form.elements[key]
-        if (input) {
-            if (input.type === 'checkbox') {
-                input.checked = value
-            } else {
-                input.value = value
-            }
-        }
-    })
-
-    const submitButton = form.querySelector('button[type="submit"]')
-    if (submitButton) {
-        submitButton.textContent = isEditing ? 'Update Deal' : 'Add Deal'
-    }
-}
-
-function formatDate(dateString) {
-    const options = { 
-        year: 'numeric', 
-        month: 'short', 
-        day: 'numeric',
-        hour: '2-digit', 
-        minute: '2-digit'
-    }
-    return new Date(dateString).toLocaleDateString('en-US', options)
-}
-
-function formatPrice(price) {
-    return new Intl.NumberFormat('de-DE', {
-        style: 'currency',
-        currency: 'EUR'
-    }).format(price)
-}
-
-async function displayDeals() {
-    try {
-        const { data, error } = await supabase
-            .from('deals')
-            .select('*')
-            .order('created_at', { ascending: false })
-            .limit(10)
-
-        if (error) throw error
-
-        const dealsList = document.getElementById('dealsList')
-        if (!dealsList) return
-
-        dealsList.innerHTML = `
-            <div class="deals-table-container">
-                <table class="deals-table">
-                    <thead>
-                        <tr>
-                            <th>To</th>
-                            <th>Price</th>
-                            <th>From</th>
-                            <th>Sample Dates</th>
-                            <th>Screenshot</th>
-                            <th>Created</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${data.map(deal => `
-                            <tr>
-                                <td>${deal.destination} ${deal.flag || ''}</td>
-                                <td>
-                                    <div class="price-info">
-                                        <span class="current-price">${formatPrice(deal.price)}</span>
-                                        <span class="original-price">${formatPrice(deal.original_price)}</span>
-                                    </div>
-                                </td>
-                                <td>${deal.departure}</td>
-                                <td>${deal.sample_dates || 'N/A'}</td>
-                                <td>${deal.deal_screenshot_url ? `<a href="${deal.deal_screenshot_url}" target="_blank">View</a>` : 'N/A'}</td>
-                                <td>${formatDate(deal.created_at)}</td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button onclick="editDeal('${deal.id}')" class="edit-btn">Edit</button>
-                                        <button onclick="deleteDeal('${deal.id}')" class="delete-btn">Delete</button>
-                                    </div>
-                                </td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            </div>
-        `
-    } catch (error) {
-        console.error('Error fetching deals:', error)
-        alert('Error fetching deals: ' + error.message)
-    }
-}
-
-async function editDeal(id) {
-    try {
-        const { data, error } = await supabase
-            .from('deals')
-            .select('*')
-            .eq('id', id)
-            .single()
-
-        if (error) throw error
-
-        isEditing = true
-        editingId = id
-        prefillForm(data)
-        document.getElementById('dealForm').scrollIntoView({ behavior: 'smooth' })
-    } catch (error) {
-        console.error('Error editing deal:', error)
-        alert('Error editing deal: ' + error.message)
-    }
-}
-
-async function deleteDeal(id) {
-    if (!confirm('Are you sure you want to delete this deal?')) return
-
-    try {
-        const { error } = await supabase
-            .from('deals')
-            .delete()
-            .eq('id', id)
-
-        if (error) throw error
-
-        await displayDeals()
-        alert('Deal deleted successfully!')
-    } catch (error) {
-        console.error('Error deleting deal:', error)
-        alert('Error deleting deal: ' + error.message)
-    }
+    // Set values for existing fields
+    form.querySelector('#id').value = data.id
+    form.querySelector('#departure').value = data.departure
+    form.querySelector('#destination').value = data.destination
+    form.querySelector('#country').value = data.country
+    form.querySelector('#flag').value = data.flag
+    form.querySelector('#travel_period').value = data.stops.split(' • ')[0]
+    form.querySelector('#travel_stops').value = data.stops.split(' • ')[1]
+    form.querySelector('#price').value = data.price
+    form.querySelector('#original_price').value = data.original_price
+    form.querySelector('#discount').value = data.discount
+    form.querySelector('#posted_by').value = data.posted_by
+    form.querySelector('#posted_by_avatar').value = data.posted_by_avatar
+    form.querySelector('#posted_by_description').value = data.posted_by_description
+    form.querySelector('#url').value = data.url
+    form.querySelector('#image_url').value = data.image_url
+    form.querySelector('#is_hot').checked = data.is_hot
+    form.querySelector('#sample_dates').value = data.sample_dates
+    form.querySelector('#deal_screenshot').value = data.deal_screenshot_url
+    form.querySelector('#trip_type').value = data.trip_type  // Add trip type
+    form.querySelector('#dates').value = data.dates  // Add dates
 }
 
 async function initializeForm() {
@@ -578,32 +456,6 @@ async function initializeForm() {
     // await signInWithEmail()
     setupCountrySearch()
     setupPostedByDropdown()
-
-    // Add trip type selector and dates input after the sample dates field
-    const sampleDatesGroup = document.querySelector('input[name="sample_dates"]').closest('.form-group');
-    
-    // Create trip type field
-    const tripTypeGroup = document.createElement('div');
-    tripTypeGroup.className = 'form-group';
-    tripTypeGroup.innerHTML = `
-        <label for="trip_type">Trip Type:</label>
-        <select id="trip_type" name="trip_type" required>
-            <option value="roundtrip">Round Trip</option>
-            <option value="oneway">One Way</option>
-        </select>
-    `;
-    
-    // Create dates field
-    const datesGroup = document.createElement('div');
-    datesGroup.className = 'form-group';
-    datesGroup.innerHTML = `
-        <label for="dates">Dates:</label>
-        <input type="text" id="dates" name="dates" required>
-    `;
-    
-    // Insert new fields after sample dates
-    sampleDatesGroup.parentNode.insertBefore(tripTypeGroup, sampleDatesGroup.nextSibling);
-    sampleDatesGroup.parentNode.insertBefore(datesGroup, tripTypeGroup.nextSibling);
 
     // Setup screenshot upload and URL input
     const screenshotInput = document.getElementById('deal_screenshot');
@@ -729,6 +581,9 @@ async function initializeForm() {
             const travelStops = formData.get('travel_stops')
             const combinedStops = `${travelPeriod} • ${travelStops}`
 
+            // Get screenshot URL directly
+            const deal_screenshot_url = formData.get('deal_screenshot')
+
             const data = {
                 id: formData.get('id'),
                 departure: formData.get('departure'),
@@ -746,7 +601,7 @@ async function initializeForm() {
                 image_url: formData.get('image_url'),
                 is_hot: formData.get('is_hot') === 'on',
                 sample_dates: formData.get('sample_dates'),
-                deal_screenshot_url: formData.get('deal_screenshot'),
+                deal_screenshot_url,
                 trip_type: formData.get('trip_type'),  // Add trip type
                 dates: formData.get('dates')  // Add dates
             }
@@ -871,22 +726,22 @@ document.querySelector('#app').innerHTML = `
         </div>
 
         <div class="form-group">
+          <label for="deal_screenshot">Deal Screenshot URL:</label>
+          <input type="url" id="deal_screenshot" name="deal_screenshot" required>
+          <div class="upload-preview"></div>
+        </div>
+
+        <div class="form-group">
           <label for="trip_type">Trip Type:</label>
           <select id="trip_type" name="trip_type" required>
-            <option value="roundtrip">Round Trip</option>
-            <option value="oneway">One Way</option>
+            <option value="roundtrip">Roundtrip</option>
+            <option value="oneway">One-way</option>
           </select>
         </div>
 
         <div class="form-group">
           <label for="dates">Dates:</label>
           <input type="text" id="dates" name="dates" required>
-        </div>
-
-        <div class="form-group">
-          <label for="deal_screenshot">Deal Screenshot URL:</label>
-          <input type="url" id="deal_screenshot" name="deal_screenshot" required>
-          <div class="upload-preview"></div>
         </div>
 
         <div class="form-group checkbox-group">
@@ -1011,7 +866,9 @@ style.textContent = `
         background-color: white;
         font-size: 16px;
     }
-
+`;
+{{ ... }}
+style.textContent += `
     .upload-image-btn {
         margin-left: 8px;
         padding: 8px 12px;
@@ -1047,21 +904,17 @@ style.textContent = `
     #deal_screenshot {
         flex: 1;
     }
+`;
 
-    select#trip_type {
+// Add the styles to the existing style element
+style.textContent += `
+    .trip-type-select {
         width: 100%;
         padding: 8px;
+        margin-bottom: 10px;
         border: 1px solid #ddd;
         border-radius: 4px;
         background-color: white;
-        font-size: 16px;
-    }
-
-    input#dates {
-        width: 100%;
-        padding: 8px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
         font-size: 16px;
     }
 `;
@@ -1078,4 +931,120 @@ if (document.readyState === 'loading') {
     initializeForm()
     prefillForm()
     displayDeals()
+}
+
+async function formatDate(dateString) {
+    const options = { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric',
+        hour: '2-digit', 
+        minute: '2-digit'
+    }
+    return new Date(dateString).toLocaleDateString('en-US', options)
+}
+
+async function formatPrice(price) {
+    return new Intl.NumberFormat('de-DE', {
+        style: 'currency',
+        currency: 'EUR'
+    }).format(price)
+}
+
+async function displayDeals() {
+    try {
+        const { data, error } = await supabase
+            .from('deals')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(10)
+
+        if (error) throw error
+
+        const dealsList = document.getElementById('dealsList')
+        if (!dealsList) return
+
+        dealsList.innerHTML = `
+            <div class="deals-table-container">
+                <table class="deals-table">
+                    <thead>
+                        <tr>
+                            <th>To</th>
+                            <th>Price</th>
+                            <th>From</th>
+                            <th>Sample Dates</th>
+                            <th>Screenshot</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.map(deal => `
+                            <tr>
+                                <td>${deal.destination} ${deal.flag || ''}</td>
+                                <td>
+                                    <div class="price-info">
+                                        <span class="current-price">${formatPrice(deal.price)}</span>
+                                        <span class="original-price">${formatPrice(deal.original_price)}</span>
+                                    </div>
+                                </td>
+                                <td>${deal.departure}</td>
+                                <td>${deal.sample_dates || 'N/A'}</td>
+                                <td>${deal.deal_screenshot_url ? `<a href="${deal.deal_screenshot_url}" target="_blank">View</a>` : 'N/A'}</td>
+                                <td>${formatDate(deal.created_at)}</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button onclick="editDeal('${deal.id}')" class="edit-btn">Edit</button>
+                                        <button onclick="deleteDeal('${deal.id}')" class="delete-btn">Delete</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `
+    } catch (error) {
+        console.error('Error fetching deals:', error)
+        alert('Error fetching deals: ' + error.message)
+    }
+}
+
+async function editDeal(id) {
+    try {
+        const { data, error } = await supabase
+            .from('deals')
+            .select('*')
+            .eq('id', id)
+            .single()
+
+        if (error) throw error
+
+        isEditing = true
+        editingId = id
+        prefillForm(data)
+        document.getElementById('dealForm').scrollIntoView({ behavior: 'smooth' })
+    } catch (error) {
+        console.error('Error editing deal:', error)
+        alert('Error editing deal: ' + error.message)
+    }
+}
+
+async function deleteDeal(id) {
+    if (!confirm('Are you sure you want to delete this deal?')) return
+
+    try {
+        const { error } = await supabase
+            .from('deals')
+            .delete()
+            .eq('id', id)
+
+        if (error) throw error
+
+        await displayDeals()
+        alert('Deal deleted successfully!')
+    } catch (error) {
+        console.error('Error deleting deal:', error)
+        alert('Error deleting deal: ' + error.message)
+    }
 }
