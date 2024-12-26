@@ -409,7 +409,6 @@ const prefillData = {
     travel_stops: 'Non-stop',
     price: 299,
     original_price: 599,
-    discount: 50,
     posted_by: '',
     posted_by_avatar: '',
     posted_by_description: '',
@@ -567,7 +566,6 @@ async function initializeForm() {
                 stops: combinedStops,
                 price: parseInt(formData.get('price')),
                 original_price: parseInt(formData.get('original_price')),
-                discount: parseInt(formData.get('discount')),
                 posted_by: formData.get('posted_by'),
                 posted_by_avatar: formData.get('posted_by_avatar'),
                 posted_by_description: formData.get('posted_by_description'),
@@ -641,7 +639,7 @@ document.querySelector('#app').innerHTML = `
         </div>
 
         <div class="form-group">
-          <label for="travel_period">Travel period:</label>
+          <label for="travel_period">Stops:</label>
           <input type="text" id="travel_period" name="travel_period" placeholder="e.g. May-Jun" required>
         </div>
 
@@ -655,18 +653,13 @@ document.querySelector('#app').innerHTML = `
         </div>
 
         <div class="form-group">
-          <label for="price">Discount price:</label>
+          <label for="price">Price:</label>
           <input type="number" id="price" name="price" required>
         </div>
 
         <div class="form-group">
           <label for="original_price">Original price:</label>
           <input type="number" id="original_price" name="original_price" required>
-        </div>
-
-        <div class="form-group">
-          <label for="discount">Discount:</label>
-          <input type="number" id="discount" name="discount" required>
         </div>
 
         <div class="form-group">
