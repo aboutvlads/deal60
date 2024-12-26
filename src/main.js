@@ -973,7 +973,8 @@ async function displayDeals() {
                             <th>To</th>
                             <th>Price</th>
                             <th>From</th>
-                            <th>Sample Dates</th>
+                            <th>Trip Type</th>
+                            <th>Dates</th>
                             <th>Screenshot</th>
                             <th>Created</th>
                             <th>Actions</th>
@@ -990,7 +991,8 @@ async function displayDeals() {
                                     </div>
                                 </td>
                                 <td>${deal.departure}</td>
-                                <td>${deal.sample_dates || 'N/A'}</td>
+                                <td>${deal.trip_type === 'roundtrip' ? 'Round Trip' : 'One Way'}</td>
+                                <td>${deal.dates || 'N/A'}</td>
                                 <td>${deal.deal_screenshot_url ? `<a href="${deal.deal_screenshot_url}" target="_blank">View</a>` : 'N/A'}</td>
                                 <td>${formatDate(deal.created_at)}</td>
                                 <td>
@@ -1066,11 +1068,28 @@ function prefillForm(data = prefillData) {
         formData.travel_stops = stops;
     }
 
+    // Ensure trip_type and dates are properly set
+    const tripTypeSelect = form.elements['trip_type'];
+    const datesInput = form.elements['dates'];
+
+    if (tripTypeSelect) {
+        tripTypeSelect.value = formData.trip_type || 'roundtrip';
+    }
+
+    if (datesInput) {
+        datesInput.value = formData.dates || '';
+    }
+
     Object.entries(formData).forEach(([key, value]) => {
         const input = form.elements[key]
         if (input) {
             if (input.type === 'checkbox') {
                 input.checked = value
+            } else if (input.type === 'select-one') {
+                // Handle select elements
+                if (value && input.querySelector(`option[value="${value}"]`)) {
+                    input.value = value;
+                }
             } else {
                 input.value = value
             }
