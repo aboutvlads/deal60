@@ -246,6 +246,29 @@ async function fetchUnsplashImages(query) {
     }
 }
 
+async function uploadScreenshot(file) {
+    try {
+        const timestamp = new Date().getTime();
+        const fileExt = file.name.split('.').pop();
+        const filePath = `${timestamp}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+
+        const { data: uploadData, error: uploadError } = await supabase.storage
+            .from('screenshots')
+            .upload(filePath, file);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+            .from('screenshots')
+            .getPublicUrl(filePath);
+
+        return publicUrl;
+    } catch (error) {
+        console.error('Error uploading screenshot:', error);
+        throw error;
+    }
+}
+
 function setupCountrySearch() {
     const countryInput = document.getElementById('country');
     const flagInput = document.getElementById('flag');
@@ -546,20 +569,80 @@ async function initializeForm() {
     setupCountrySearch()
     setupPostedByDropdown()
 
+    // Setup screenshot upload and URL input
+    const screenshotInput = document.getElementById('deal_screenshot');
+    const previewDiv = screenshotInput.nextElementSibling;
+
+    // Create file upload button
+    const uploadButton = document.createElement('button');
+    uploadButton.type = 'button';
+    uploadButton.textContent = '📤 Upload Image';
+    uploadButton.className = 'upload-image-btn';
+
+    // Create hidden file input
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
+    fileInput.style.display = 'none';
+
+    // Add upload button next to URL input
+    screenshotInput.parentNode.insertBefore(uploadButton, screenshotInput.nextSibling);
+    screenshotInput.parentNode.insertBefore(fileInput, uploadButton);
+
+    // Handle file selection
+    fileInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        try {
+            uploadButton.disabled = true;
+            uploadButton.textContent = 'Uploading...';
+            
+            // Show loading preview
+            previewDiv.innerHTML = '<div class="loading-spinner">Uploading...</div>';
+
+            // Upload file and get URL
+            const publicUrl = await uploadScreenshot(file);
+            
+            // Update URL input and preview
+            screenshotInput.value = publicUrl;
+            previewDiv.innerHTML = `<img src="${publicUrl}" alt="Screenshot preview">`;
+        } catch (error) {
+            alert('Error uploading image: ' + error.message);
+            previewDiv.innerHTML = '';
+        } finally {
+            uploadButton.disabled = false;
+            uploadButton.textContent = '📤 Upload Image';
+        }
+    });
+
+    // Click handler for upload button
+    uploadButton.addEventListener('click', () => {
+        fileInput.click();
+    });
+
+    // URL input preview handler
+    screenshotInput.addEventListener('input', (e) => {
+        const url = e.target.value;
+        if (url) {
+            previewDiv.innerHTML = `<img src="${url}" alt="Screenshot preview" onerror="this.src=''; this.alt='Invalid image URL'">`;
+        } else {
+            previewDiv.innerHTML = '';
+        }
+    });
+
     // Setup destination-based image suggestions
     const destinationInput = document.getElementById('destination');
     const imageUrlInput = document.getElementById('image_url');
-    const screenshotInput = document.getElementById('deal_screenshot');
-    
-    // Create and add the suggestion button and container
+    const suggestionContainer = document.createElement('div');
+    suggestionContainer.className = 'image-suggestions';
+
+    // Create and add the suggestion button
     const suggestButton = document.createElement('button');
     suggestButton.type = 'button';
     suggestButton.textContent = '🖼 Suggest Images';
     suggestButton.className = 'suggest-images-btn';
-    
-    const suggestionContainer = document.createElement('div');
-    suggestionContainer.className = 'image-suggestions';
-    
+
     imageUrlInput.parentNode.insertBefore(suggestButton, imageUrlInput.nextSibling);
     imageUrlInput.parentNode.insertBefore(suggestionContainer, suggestButton.nextSibling);
 
@@ -599,17 +682,6 @@ async function initializeForm() {
         imageUrlInput.value = url;
         suggestionContainer.innerHTML = ''; // Clear suggestions after selection
     };
-
-    // Setup screenshot preview
-    const previewDiv = screenshotInput.nextElementSibling;
-    screenshotInput.addEventListener('input', (e) => {
-        const url = e.target.value;
-        if (url) {
-            previewDiv.innerHTML = `<img src="${url}" alt="Screenshot preview" onerror="this.src=''; this.alt='Invalid image URL'">`;
-        } else {
-            previewDiv.innerHTML = '';
-        }
-    });
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault()
@@ -890,6 +962,81 @@ style.textContent = `
         border-radius: 4px;
         background-color: white;
         font-size: 16px;
+    }
+
+    .upload-image-btn {
+        margin-left: 8px;
+        padding: 8px 12px;
+        background: #f0f0f0;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .upload-image-btn:hover {
+        background: #e0e0e0;
+    }
+
+    .upload-image-btn:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+
+    .loading-spinner {
+        padding: 20px;
+        text-align: center;
+        color: #666;
+    }
+
+    /* Make URL input and upload button appear on the same line */
+    .form-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    #deal_screenshot {
+        flex: 1;
+    }
+`;
+
+// Add the styles to the existing style element
+style.textContent += `
+    .upload-image-btn {
+        margin-left: 8px;
+        padding: 8px 12px;
+        background: #f0f0f0;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .upload-image-btn:hover {
+        background: #e0e0e0;
+    }
+
+    .upload-image-btn:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+
+    .loading-spinner {
+        padding: 20px;
+        text-align: center;
+        color: #666;
+    }
+
+    /* Make URL input and upload button appear on the same line */
+    .form-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    #deal_screenshot {
+        flex: 1;
     }
 `;
 
