@@ -208,6 +208,39 @@ const countries = [
     { name: 'Zimbabwe', code: 'ZW', emoji: '🇿🇼' }
 ];
 
+const CITY_TO_COUNTRY = {
+    'paris': { country: 'France', code: 'FR' },
+    'london': { country: 'United Kingdom', code: 'GB' },
+    'new york': { country: 'United States', code: 'US' },
+    'tokyo': { country: 'Japan', code: 'JP' },
+    'rome': { country: 'Italy', code: 'IT' },
+    'berlin': { country: 'Germany', code: 'DE' },
+    'madrid': { country: 'Spain', code: 'ES' },
+    'amsterdam': { country: 'Netherlands', code: 'NL' },
+    'bangkok': { country: 'Thailand', code: 'TH' },
+    'dubai': { country: 'United Arab Emirates', code: 'AE' },
+    'singapore': { country: 'Singapore', code: 'SG' },
+    'sydney': { country: 'Australia', code: 'AU' },
+    'istanbul': { country: 'Turkey', code: 'TR' },
+    'moscow': { country: 'Russia', code: 'RU' },
+    'beijing': { country: 'China', code: 'CN' },
+    'seoul': { country: 'South Korea', code: 'KR' },
+    'vienna': { country: 'Austria', code: 'AT' },
+    'prague': { country: 'Czech Republic', code: 'CZ' },
+    'lisbon': { country: 'Portugal', code: 'PT' },
+    'athens': { country: 'Greece', code: 'GR' },
+    'venice': { country: 'Italy', code: 'IT' },
+    'barcelona': { country: 'Spain', code: 'ES' },
+    'milan': { country: 'Italy', code: 'IT' },
+    'munich': { country: 'Germany', code: 'DE' },
+    'zurich': { country: 'Switzerland', code: 'CH' },
+    'stockholm': { country: 'Sweden', code: 'SE' },
+    'oslo': { country: 'Norway', code: 'NO' },
+    'copenhagen': { country: 'Denmark', code: 'DK' },
+    'dublin': { country: 'Ireland', code: 'IE' },
+    'brussels': { country: 'Belgium', code: 'BE' }
+};
+
 const PREDEFINED_USERS = [
     {
         name: 'Vlad',
@@ -322,6 +355,26 @@ function setupCountrySearch() {
     });
 }
 
+function setupDestinationCountryAutoFill() {
+    const destinationInput = document.getElementById('destination');
+    const countryInput = document.getElementById('country');
+    const flagInput = document.getElementById('flag');
+
+    destinationInput.addEventListener('input', (e) => {
+        const city = e.target.value.toLowerCase().trim();
+        const cityInfo = CITY_TO_COUNTRY[city];
+
+        if (cityInfo) {
+            // Find the country in our countries array
+            const countryData = countries.find(c => c.code === cityInfo.code);
+            if (countryData) {
+                countryInput.value = countryData.name;
+                flagInput.value = countryData.emoji;
+            }
+        }
+    });
+}
+
 function setupPostedByDropdown() {
     const postedByInput = document.getElementById('posted_by');
     const postedByAvatarInput = document.getElementById('posted_by_avatar');
@@ -405,7 +458,6 @@ const prefillData = {
     destination: 'Paris',
     country: '',
     flag: '',
-    travel_period: '2h 30m',
     travel_stops: 'Non-stop',
     price: 299,
     original_price: 599,
@@ -415,7 +467,6 @@ const prefillData = {
     url: 'https://example.com',
     image_url: '',
     is_hot: false,
-    sample_dates: '',
     deal_screenshot_url: '',
     trip_type: 'roundtrip',
     dates: ''
@@ -429,6 +480,7 @@ async function initializeForm() {
     // await signInWithEmail()
     setupCountrySearch()
     setupPostedByDropdown()
+    setupDestinationCountryAutoFill()
 
     // Setup screenshot upload and URL input
     const screenshotInput = document.getElementById('deal_screenshot');
@@ -550,12 +602,7 @@ async function initializeForm() {
 
         try {
             const formData = new FormData(e.target)
-            const travelPeriod = formData.get('travel_period')
             const travelStops = formData.get('travel_stops')
-            const combinedStops = `${travelPeriod} • ${travelStops}`
-
-            // Get screenshot URL directly
-            const deal_screenshot_url = formData.get('deal_screenshot')
 
             const data = {
                 id: formData.get('id'),
@@ -563,7 +610,7 @@ async function initializeForm() {
                 destination: formData.get('destination'),
                 country: formData.get('country'),
                 flag: formData.get('flag'),
-                stops: combinedStops,
+                stops: travelStops,
                 price: parseInt(formData.get('price')),
                 original_price: parseInt(formData.get('original_price')),
                 posted_by: formData.get('posted_by'),
@@ -572,8 +619,7 @@ async function initializeForm() {
                 url: formData.get('url'),
                 image_url: formData.get('image_url'),
                 is_hot: formData.get('is_hot') === 'on',
-                sample_dates: formData.get('sample_dates'),
-                deal_screenshot_url,
+                deal_screenshot_url: formData.get('deal_screenshot'),
                 trip_type: formData.get('trip_type'),
                 dates: formData.get('dates')
             }
@@ -629,26 +675,21 @@ document.querySelector('#app').innerHTML = `
         </div>
 
         <div class="form-group">
-          <label for="country">To (country):</label>
+          <label for="country">Country:</label>
           <input type="text" id="country" name="country" required>
         </div>
 
         <div class="form-group">
-          <label for="flag">To (country emoji):</label>
-          <input type="text" id="flag" name="flag" readonly>
-        </div>
-
-        <div class="form-group">
-          <label for="travel_period">Stops:</label>
-          <input type="text" id="travel_period" name="travel_period" placeholder="e.g. May-Jun" required>
+          <label for="flag">Flag:</label>
+          <input type="text" id="flag" name="flag" required>
         </div>
 
         <div class="form-group">
           <label for="travel_stops">Stops:</label>
           <select id="travel_stops" name="travel_stops" required>
-            <option value="Direct">Direct</option>
-            <option value="1 Stop">1 Stop</option>
-            <option value="2+ Stops">2+ Stops</option>
+            <option value="Non-stop">Non-stop</option>
+            <option value="1 stop">1 stop</option>
+            <option value="2+ stops">2+ stops</option>
           </select>
         </div>
 
@@ -685,11 +726,6 @@ document.querySelector('#app').innerHTML = `
         <div class="form-group">
           <label for="image_url">Image URL:</label>
           <input type="url" id="image_url" name="image_url" required>
-        </div>
-
-        <div class="form-group">
-          <label for="sample_dates">Sample Dates:</label>
-          <textarea id="sample_dates" name="sample_dates" rows="3" required></textarea>
         </div>
 
         <div class="form-group">
@@ -1028,25 +1064,6 @@ function prefillForm(data = prefillData) {
     const formData = { ...data }
     if (!isEditing) {
         formData.id = generateUUID()
-    }
-
-    // If we're editing and have a combined stops value, split it
-    if (isEditing && formData.stops) {
-        const [period, stops] = formData.stops.split(' • ');
-        formData.travel_period = period;
-        formData.travel_stops = stops;
-    }
-
-    // Ensure trip_type and dates are properly set
-    const tripTypeSelect = form.elements['trip_type'];
-    const datesInput = form.elements['dates'];
-
-    if (tripTypeSelect) {
-        tripTypeSelect.value = formData.trip_type || 'roundtrip';
-    }
-
-    if (datesInput) {
-        datesInput.value = formData.dates || '';
     }
 
     Object.entries(formData).forEach(([key, value]) => {
