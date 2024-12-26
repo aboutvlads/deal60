@@ -6,6 +6,8 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJ
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
+const UNSPLASH_ACCESS_KEY = 'JLkM54mnaCL1pz6-FggtyOZNIV7B7p6cNFx8wmCFR-0'; // You'll need to replace this with a real Unsplash API key
+
 let isEditing = false;
 let editingId = null;
 
@@ -205,6 +207,21 @@ const countries = [
     { name: 'Zambia', code: 'ZM', emoji: '🇿🇲' },
     { name: 'Zimbabwe', code: 'ZW', emoji: '🇿🇼' }
 ];
+
+async function fetchUnsplashImages(query) {
+    try {
+        const response = await fetch(`https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=9`, {
+            headers: {
+                'Authorization': `Client-ID ${UNSPLASH_ACCESS_KEY}`
+            }
+        });
+        const data = await response.json();
+        return data.results;
+    } catch (error) {
+        console.error('Error fetching Unsplash images:', error);
+        return [];
+    }
+}
 
 function setupCountrySearch() {
     const countryInput = document.getElementById('country');
@@ -460,18 +477,74 @@ async function initializeForm() {
     await signInWithEmail()
     setupCountrySearch()
 
-    // Setup screenshot preview
-    const screenshotInput = document.getElementById('deal_screenshot')
-    const previewDiv = screenshotInput.nextElementSibling
+    // Setup destination-based image suggestions
+    const destinationInput = document.getElementById('destination');
+    const screenshotInput = document.getElementById('deal_screenshot');
+    const previewDiv = screenshotInput.nextElementSibling;
     
-    screenshotInput.addEventListener('input', (e) => {
-        const url = e.target.value
-        if (url) {
-            previewDiv.innerHTML = `<img src="${url}" alt="Screenshot preview" onerror="this.src=''; this.alt='Invalid image URL'">`
-        } else {
-            previewDiv.innerHTML = ''
+    // Create and add the suggestion button and container
+    const suggestButton = document.createElement('button');
+    suggestButton.type = 'button';
+    suggestButton.textContent = '🖼 Suggest Images';
+    suggestButton.className = 'suggest-images-btn';
+    
+    const suggestionContainer = document.createElement('div');
+    suggestionContainer.className = 'image-suggestions';
+    
+    screenshotInput.parentNode.insertBefore(suggestButton, previewDiv);
+    screenshotInput.parentNode.insertBefore(suggestionContainer, previewDiv);
+
+    suggestButton.addEventListener('click', async () => {
+        const destination = destinationInput.value;
+        if (!destination) {
+            alert('Please enter a destination first');
+            return;
         }
-    })
+
+        suggestButton.disabled = true;
+        suggestButton.textContent = 'Loading...';
+        suggestionContainer.innerHTML = 'Loading suggestions...';
+
+        const images = await fetchUnsplashImages(destination + ' city');
+        
+        if (images.length === 0) {
+            suggestionContainer.innerHTML = 'No images found. Try a different destination.';
+            suggestButton.disabled = false;
+            suggestButton.textContent = '🖼 Suggest Images';
+            return;
+        }
+
+        suggestionContainer.innerHTML = images.map(img => `
+            <div class="suggestion-item" onclick="selectUnsplashImage('${img.urls.regular}')">
+                <img src="${img.urls.thumb}" alt="${img.alt_description || destination}">
+                <span class="credit">Photo by ${img.user.name} on Unsplash</span>
+            </div>
+        `).join('');
+
+        suggestButton.disabled = false;
+        suggestButton.textContent = '🖼 Suggest Images';
+    });
+
+    // Add the selectUnsplashImage function to window scope
+    window.selectUnsplashImage = (url) => {
+        screenshotInput.value = url;
+        previewDiv.innerHTML = `<img src="${url}" alt="Screenshot preview" onerror="this.src=''; this.alt='Invalid image URL'">`;
+        suggestionContainer.innerHTML = ''; // Clear suggestions after selection
+    };
+
+    screenshotInput.addEventListener('input', (e) => {
+        const url = e.target.value;
+        if (url) {
+            previewDiv.innerHTML = `<img src="${url}" alt="Screenshot preview" onerror="this.src=''; this.alt='Invalid image URL'">`;
+        } else {
+            previewDiv.innerHTML = '';
+        }
+    });
+
+    // Setup screenshot preview
+    const screenshotPreview = document.createElement('div');
+    screenshotPreview.className = 'upload-preview';
+    screenshotInput.parentNode.insertBefore(screenshotPreview, previewDiv);
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault()
@@ -696,7 +769,55 @@ style.textContent = `
         border-radius: 4px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
+
+    .suggest-images-btn {
+        margin: 5px 0;
+        padding: 5px 10px;
+        background: #f0f0f0;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .suggest-images-btn:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+
+    .image-suggestions {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 10px;
+        margin: 10px 0;
+    }
+
+    .suggestion-item {
+        cursor: pointer;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        overflow: hidden;
+        transition: transform 0.2s;
+    }
+
+    .suggestion-item:hover {
+        transform: scale(1.05);
+    }
+
+    .suggestion-item img {
+        width: 100%;
+        height: 100px;
+        object-fit: cover;
+    }
+
+    .suggestion-item .credit {
+        display: block;
+        font-size: 0.8em;
+        padding: 5px;
+        background: rgba(0,0,0,0.7);
+        color: white;
+    }
 `;
+
 document.head.appendChild(style);
 
 if (document.readyState === 'loading') {
