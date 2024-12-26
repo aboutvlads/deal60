@@ -467,6 +467,7 @@ const prefillData = {
     url: 'https://example.com',
     image_url: '',
     is_hot: false,
+    sample_dates: '',
     deal_screenshot_url: '',
     trip_type: 'roundtrip',
     dates: ''
@@ -619,6 +620,7 @@ async function initializeForm() {
                 url: formData.get('url'),
                 image_url: formData.get('image_url'),
                 is_hot: formData.get('is_hot') === 'on',
+                sample_dates: formData.get('sample_dates'),
                 deal_screenshot_url: formData.get('deal_screenshot'),
                 trip_type: formData.get('trip_type'),
                 dates: formData.get('dates')
@@ -699,7 +701,7 @@ document.querySelector('#app').innerHTML = `
         </div>
 
         <div class="form-group">
-          <label for="original_price">Original price:</label>
+          <label for="original_price">Original Price:</label>
           <input type="number" id="original_price" name="original_price" required>
         </div>
 
@@ -729,6 +731,11 @@ document.querySelector('#app').innerHTML = `
         </div>
 
         <div class="form-group">
+          <label for="sample_dates">Sample Dates:</label>
+          <textarea id="sample_dates" name="sample_dates" rows="3" required></textarea>
+        </div>
+
+        <div class="form-group">
           <label for="deal_screenshot">Deal Screenshot URL:</label>
           <input type="url" id="deal_screenshot" name="deal_screenshot" required>
           <div class="upload-preview"></div>
@@ -744,7 +751,7 @@ document.querySelector('#app').innerHTML = `
 
         <div class="form-group">
           <label for="dates">Dates:</label>
-          <input type="text" id="dates" name="dates" placeholder="e.g., Jan 15 - Jan 22, 2024" required>
+          <input type="text" id="dates" name="dates" required>
         </div>
 
         <div class="form-group checkbox-group">
