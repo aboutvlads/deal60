@@ -851,39 +851,122 @@ async function initializeForm() {
 window.editDeal = editDeal;
 window.deleteDeal = deleteDeal;
 
-document.addEventListener('DOMContentLoaded', () => {
-    const app = document.getElementById('app');
-    if (!app) return;
-
-    app.innerHTML = `
-        <div class="container">
-            <h1>Add New Deal</h1>
-            <form id="dealForm">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="departure">From:</label>
-                        <div class="departure-wrapper">
-                            <input type="text" class="airport-search" id="departure" placeholder="Enter city name" required>
-                            <select class="trip-type-select">
-                                <option value="Roundtrip">Roundtrip</option>
-                                <option value="One Way">One Way</option>
-                            </select>
-                        </div>
-                        <div class="airport-suggestions"></div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="destination">To:</label>
-                        <input type="text" id="destination" name="destination" required>
-                    </div>
-                </div>
-                <!-- Rest of your form fields -->
-            </form>
+document.querySelector('#app').innerHTML = `
+  <div class="container">
+    <h1>Travel Deals Manager</h1>
+    
+    <form id="dealForm" class="deal-form">
+      <input type="hidden" id="id" name="id">
+      
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="departure">From:</label>
+          <div class="departure-wrapper">
+            <input type="text" id="departure" name="departure" required>
+            <select class="trip-type-select">
+                <option value="Roundtrip">Roundtrip</option>
+                <option value="One Way">One Way</option>
+            </select>
+            <input type="hidden" id="departure_full" name="departure">
+            <div class="airport-suggestions"></div>
+          </div>
         </div>
-    `;
 
-    initializeForm();
-});
+        <div class="form-group">
+          <label for="destination">To:</label>
+          <input type="text" id="destination" name="destination" required>
+        </div>
+
+        <div class="form-group">
+          <label for="country">To (country):</label>
+          <input type="text" id="country" name="country" required>
+        </div>
+
+        <div class="form-group">
+          <label for="flag">To (country emoji):</label>
+          <input type="text" id="flag" name="flag" readonly>
+        </div>
+
+        <div class="form-group">
+          <label for="travel_period">Travel period:</label>
+          <input type="text" id="travel_period" name="travel_period" placeholder="e.g. May-Jun" required>
+        </div>
+
+        <div class="form-group">
+          <label for="travel_stops">Stops:</label>
+          <select id="travel_stops" name="travel_stops" required>
+            <option value="Direct">Direct</option>
+            <option value="1 Stop">1 Stop</option>
+            <option value="2+ Stops">2+ Stops</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="price">Discount price:</label>
+          <input type="number" id="price" name="price" required>
+        </div>
+
+        <div class="form-group">
+          <label for="original_price">Original price:</label>
+          <input type="number" id="original_price" name="original_price" required>
+        </div>
+
+        <div class="form-group">
+          <label for="discount">Discount:</label>
+          <input type="number" id="discount" name="discount" required>
+        </div>
+
+        <div class="form-group">
+          <label for="posted_by">Posted By:</label>
+          <input type="text" id="posted_by" name="posted_by" required>
+        </div>
+
+        <div class="form-group">
+          <label for="posted_by_avatar">Posted By Avatar:</label>
+          <input type="url" id="posted_by_avatar" name="posted_by_avatar">
+        </div>
+
+        <div class="form-group">
+          <label for="posted_by_description">Posted By Description:</label>
+          <input type="text" id="posted_by_description" name="posted_by_description">
+        </div>
+
+        <div class="form-group">
+          <label for="url">URL:</label>
+          <input type="url" id="url" name="url" required>
+        </div>
+
+        <div class="form-group">
+          <label for="image_url">Image URL:</label>
+          <input type="url" id="image_url" name="image_url" required>
+        </div>
+
+        <div class="form-group">
+          <label for="sample_dates">Sample Dates:</label>
+          <textarea id="sample_dates" name="sample_dates" rows="3" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="deal_screenshot">Deal Screenshot URL:</label>
+          <input type="url" id="deal_screenshot" name="deal_screenshot" required>
+          <div class="upload-preview"></div>
+        </div>
+
+        <div class="form-group checkbox-group">
+          <label for="is_hot">Is HOT DEAL?</label>
+          <input type="checkbox" id="is_hot" name="is_hot">
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="submit-btn">Add Deal</button>
+        <button type="button" class="reset-btn" onclick="prefillForm()">Reset</button>
+      </div>
+    </form>
+
+    <div id="dealsList" class="deals-list"></div>
+  </div>
+`
 
 const style = document.createElement('style');
 style.textContent = `
@@ -1105,16 +1188,8 @@ style.textContent = `
 
 // Add the styles to the existing style element
 style.textContent += `
-    .form-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 20px;
-        margin-bottom: 20px;
-    }
-
     .form-group {
         margin-bottom: 15px;
-        position: relative;
     }
 
     .departure-wrapper {
@@ -1122,26 +1197,24 @@ style.textContent += `
         display: flex;
         gap: 8px;
         width: 100%;
-        z-index: 100; /* Add higher z-index to keep it above other elements */
     }
 
     .airport-search {
-        flex: 1;
+        flex: 2;
         padding: 12px;
         border: 1px solid #ddd;
         border-radius: 4px;
         font-size: 16px;
-        min-width: 200px;
+        min-width: 250px;
     }
 
     .trip-type-select {
-        width: 120px;
+        flex: 0 0 120px;
         padding: 12px;
         border: 1px solid #ddd;
         border-radius: 4px;
         background-color: white;
         font-size: 16px;
-        flex-shrink: 0;
     }
 
     .airport-suggestions {
@@ -1192,20 +1265,18 @@ style.textContent += `
         font-size: 14px;
         min-width: 100px;
     }
-
-    /* Ensure other form elements don't overlap */
-    .form-group input,
-    .form-group select {
-        width: 100%;
-        padding: 12px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        font-size: 16px;
-        background-color: white;
-    }
 `;
 
 document.head.appendChild(style);
 
-prefillForm()
-displayDeals()
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', async () => {
+        await initializeForm()
+        prefillForm()
+        displayDeals()
+    })
+} else {
+    initializeForm()
+    prefillForm()
+    displayDeals()
+}
