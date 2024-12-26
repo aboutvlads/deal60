@@ -401,6 +401,7 @@ function setupDepartureField() {
     airportSearch.type = 'text';
     airportSearch.placeholder = 'Enter city name';
     airportSearch.className = 'airport-search';
+    airportSearch.id = 'departure'; // Keep the original ID
 
     // Create trip type selector
     const tripTypeSelect = document.createElement('select');
@@ -418,7 +419,6 @@ function setupDepartureField() {
     departureInput.parentNode.replaceChild(departureWrapper, departureInput);
     departureWrapper.appendChild(airportSearch);
     departureWrapper.appendChild(tripTypeSelect);
-    departureWrapper.appendChild(departureFullInput);
     departureWrapper.appendChild(suggestionsDiv);
 
     // Handle airport search
@@ -434,13 +434,18 @@ function setupDepartureField() {
             airport.code.toLowerCase().includes(value)
         );
 
-        suggestionsDiv.innerHTML = matches.map(airport => `
-            <div class="airport-suggestion" data-code="${airport.code}" data-city="${airport.city}">
-                <span class="airport-code">${airport.code}</span>
-                <span class="airport-city">${airport.city}</span>
-                <span class="airport-country">${airport.country}</span>
-            </div>
-        `).join('');
+        if (matches.length > 0) {
+            suggestionsDiv.style.display = 'block';
+            suggestionsDiv.innerHTML = matches.map(airport => `
+                <div class="airport-suggestion" data-code="${airport.code}" data-city="${airport.city}">
+                    <span class="airport-code">${airport.code}</span>
+                    <span class="airport-city">${airport.city}</span>
+                    <span class="airport-country">${airport.country}</span>
+                </div>
+            `).join('');
+        } else {
+            suggestionsDiv.style.display = 'none';
+        }
 
         // Add click handlers to suggestions
         suggestionsDiv.querySelectorAll('.airport-suggestion').forEach(div => {
@@ -449,9 +454,8 @@ function setupDepartureField() {
                 const city = div.dataset.city;
                 const tripType = tripTypeSelect.value;
                 
-                airportSearch.value = city;
-                departureFullInput.value = `${code}, ${city} (${tripType})`;
-                suggestionsDiv.innerHTML = '';
+                airportSearch.value = `${code}, ${city}`;
+                suggestionsDiv.style.display = 'none';
             });
         });
     });
@@ -459,11 +463,9 @@ function setupDepartureField() {
     // Update full value when trip type changes
     tripTypeSelect.addEventListener('change', () => {
         if (airportSearch.value) {
-            const airport = AIRPORTS.find(a => 
-                a.city.toLowerCase() === airportSearch.value.toLowerCase()
-            );
-            if (airport) {
-                departureFullInput.value = `${airport.code}, ${airport.city} (${tripTypeSelect.value})`;
+            const [code, city] = airportSearch.value.split(', ');
+            if (city) {
+                airportSearch.value = `${code}, ${city} (${tripTypeSelect.value})`;
             }
         }
     });
@@ -471,7 +473,7 @@ function setupDepartureField() {
     // Close suggestions when clicking outside
     document.addEventListener('click', (e) => {
         if (!departureWrapper.contains(e.target)) {
-            suggestionsDiv.innerHTML = '';
+            suggestionsDiv.style.display = 'none';
         }
     });
 }
@@ -1130,23 +1132,26 @@ style.textContent = `
         position: relative;
         display: flex;
         gap: 8px;
-        margin-bottom: 10px;
+        width: 100%;
     }
 
     .airport-search {
-        flex: 1;
-        padding: 8px;
+        flex: 2;
+        padding: 12px;
         border: 1px solid #ddd;
         border-radius: 4px;
         font-size: 16px;
+        min-width: 300px;
     }
 
     .trip-type-select {
-        padding: 8px;
+        flex: 1;
+        padding: 12px;
         border: 1px solid #ddd;
         border-radius: 4px;
         background-color: white;
         font-size: 16px;
+        max-width: 150px;
     }
 
     .airport-suggestions {
@@ -1157,17 +1162,19 @@ style.textContent = `
         background: white;
         border: 1px solid #ddd;
         border-radius: 4px;
-        max-height: 200px;
+        max-height: 300px;
         overflow-y: auto;
         z-index: 1000;
+        display: none;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
 
     .airport-suggestion {
-        padding: 8px;
+        padding: 12px;
         cursor: pointer;
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 15px;
     }
 
     .airport-suggestion:hover {
@@ -1177,15 +1184,18 @@ style.textContent = `
     .airport-code {
         font-weight: bold;
         color: #666;
+        min-width: 60px;
     }
 
     .airport-city {
         flex: 1;
+        font-size: 16px;
     }
 
     .airport-country {
         color: #888;
-        font-size: 0.9em;
+        font-size: 14px;
+        min-width: 100px;
     }
 `;
 
@@ -1195,23 +1205,26 @@ style.textContent += `
         position: relative;
         display: flex;
         gap: 8px;
-        margin-bottom: 10px;
+        width: 100%;
     }
 
     .airport-search {
-        flex: 1;
-        padding: 8px;
+        flex: 2;
+        padding: 12px;
         border: 1px solid #ddd;
         border-radius: 4px;
         font-size: 16px;
+        min-width: 300px;
     }
 
     .trip-type-select {
-        padding: 8px;
+        flex: 1;
+        padding: 12px;
         border: 1px solid #ddd;
         border-radius: 4px;
         background-color: white;
         font-size: 16px;
+        max-width: 150px;
     }
 
     .airport-suggestions {
@@ -1222,17 +1235,19 @@ style.textContent += `
         background: white;
         border: 1px solid #ddd;
         border-radius: 4px;
-        max-height: 200px;
+        max-height: 300px;
         overflow-y: auto;
         z-index: 1000;
+        display: none;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
 
     .airport-suggestion {
-        padding: 8px;
+        padding: 12px;
         cursor: pointer;
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 15px;
     }
 
     .airport-suggestion:hover {
@@ -1242,15 +1257,18 @@ style.textContent += `
     .airport-code {
         font-weight: bold;
         color: #666;
+        min-width: 60px;
     }
 
     .airport-city {
         flex: 1;
+        font-size: 16px;
     }
 
     .airport-country {
         color: #888;
-        font-size: 0.9em;
+        font-size: 14px;
+        min-width: 100px;
     }
 `;
 
