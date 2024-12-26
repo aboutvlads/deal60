@@ -208,6 +208,29 @@ const countries = [
     { name: 'Zimbabwe', code: 'ZW', emoji: '🇿🇼' }
 ];
 
+const PREDEFINED_USERS = [
+    {
+        name: 'Vlad',
+        avatar: 'https://pbs.twimg.com/profile_images/1861513689720881152/86GYfxoC_400x400.jpg',
+        description: 'Deal Hunter'
+    },
+    {
+        name: 'Alex',
+        avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
+        description: 'Travel Enthusiast'
+    },
+    {
+        name: 'Emma',
+        avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
+        description: 'Budget Travel Expert'
+    },
+    {
+        name: 'Marco',
+        avatar: 'https://randomuser.me/api/portraits/men/85.jpg',
+        description: 'Airline Deals Specialist'
+    }
+];
+
 async function fetchUnsplashImages(query) {
     try {
         const response = await fetch(`https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=9`, {
@@ -265,6 +288,51 @@ function setupCountrySearch() {
     document.addEventListener('click', function(e) {
         if (!countryInput.contains(e.target) && !countryList.contains(e.target)) {
             countryList.style.display = 'none';
+        }
+    });
+}
+
+function setupPostedByDropdown() {
+    const postedByInput = document.getElementById('posted_by');
+    const postedByAvatarInput = document.getElementById('posted_by_avatar');
+    const postedByDescriptionInput = document.getElementById('posted_by_description');
+
+    // Create dropdown
+    const dropdown = document.createElement('select');
+    dropdown.id = 'posted_by_dropdown';
+    dropdown.className = 'posted-by-dropdown';
+
+    // Add default option
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = 'Select a Deal Hunter';
+    dropdown.appendChild(defaultOption);
+
+    // Add predefined users to dropdown
+    PREDEFINED_USERS.forEach((user, index) => {
+        const option = document.createElement('option');
+        option.value = index;
+        option.textContent = user.name;
+        dropdown.appendChild(option);
+    });
+
+    // Insert dropdown before the existing input
+    postedByInput.parentNode.insertBefore(dropdown, postedByInput);
+    postedByInput.style.display = 'none'; // Hide the original input
+
+    // Add event listener to update inputs when dropdown changes
+    dropdown.addEventListener('change', (e) => {
+        const selectedIndex = e.target.value;
+        if (selectedIndex !== '') {
+            const selectedUser = PREDEFINED_USERS[selectedIndex];
+            postedByInput.value = selectedUser.name;
+            postedByAvatarInput.value = selectedUser.avatar;
+            postedByDescriptionInput.value = selectedUser.description;
+        } else {
+            // Reset inputs if no user is selected
+            postedByInput.value = '';
+            postedByAvatarInput.value = '';
+            postedByDescriptionInput.value = '';
         }
     });
 }
@@ -476,6 +544,7 @@ async function initializeForm() {
 
     await signInWithEmail()
     setupCountrySearch()
+    setupPostedByDropdown()
 
     // Setup destination-based image suggestions
     const destinationInput = document.getElementById('destination');
@@ -811,6 +880,16 @@ style.textContent = `
         padding: 5px;
         background: rgba(0,0,0,0.7);
         color: white;
+    }
+
+    .posted-by-dropdown {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background-color: white;
+        font-size: 16px;
     }
 `;
 
