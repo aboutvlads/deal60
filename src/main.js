@@ -386,46 +386,31 @@ function setupPostedByDropdown() {
 }
 
 function setupDepartureField() {
-    const departureInput = document.getElementById('departure');
-    const departureWrapper = document.createElement('div');
-    departureWrapper.className = 'departure-wrapper';
-    
-    // Create hidden input for the full formatted value
-    const departureFullInput = document.createElement('input');
-    departureFullInput.type = 'hidden';
-    departureFullInput.name = 'departure';
-    departureFullInput.id = 'departure_full';
+    const departureGroup = document.querySelector('.form-group:has(#departure)');
+    if (!departureGroup) return;
 
-    // Create airport search input
-    const airportSearch = document.createElement('input');
-    airportSearch.type = 'text';
-    airportSearch.placeholder = 'Enter city name';
-    airportSearch.className = 'airport-search';
-    airportSearch.id = 'departure'; // Keep the original ID
-
-    // Create trip type selector
-    const tripTypeSelect = document.createElement('select');
-    tripTypeSelect.className = 'trip-type-select';
-    tripTypeSelect.innerHTML = `
-        <option value="Roundtrip">Roundtrip</option>
-        <option value="One Way">One Way</option>
+    // Clear the existing content
+    departureGroup.innerHTML = `
+        <label for="departure">From:</label>
+        <div class="departure-wrapper">
+            <input type="text" class="airport-search" id="departure" placeholder="Enter city name" required>
+            <select class="trip-type-select">
+                <option value="Roundtrip">Roundtrip</option>
+                <option value="One Way">One Way</option>
+            </select>
+            <div class="airport-suggestions"></div>
+        </div>
     `;
 
-    // Create suggestions container
-    const suggestionsDiv = document.createElement('div');
-    suggestionsDiv.className = 'airport-suggestions';
-
-    // Replace original input with our new elements
-    departureInput.parentNode.replaceChild(departureWrapper, departureInput);
-    departureWrapper.appendChild(airportSearch);
-    departureWrapper.appendChild(tripTypeSelect);
-    departureWrapper.appendChild(suggestionsDiv);
+    const airportSearch = departureGroup.querySelector('.airport-search');
+    const tripTypeSelect = departureGroup.querySelector('.trip-type-select');
+    const suggestionsDiv = departureGroup.querySelector('.airport-suggestions');
 
     // Handle airport search
     airportSearch.addEventListener('input', (e) => {
         const value = e.target.value.toLowerCase();
         if (value.length < 2) {
-            suggestionsDiv.innerHTML = '';
+            suggestionsDiv.style.display = 'none';
             return;
         }
 
@@ -443,36 +428,34 @@ function setupDepartureField() {
                     <span class="airport-country">${airport.country}</span>
                 </div>
             `).join('');
+
+            // Add click handlers to suggestions
+            suggestionsDiv.querySelectorAll('.airport-suggestion').forEach(div => {
+                div.addEventListener('click', () => {
+                    const code = div.dataset.code;
+                    const city = div.dataset.city;
+                    const tripType = tripTypeSelect.value;
+                    
+                    airportSearch.value = `${code}, ${city} (${tripType})`;
+                    suggestionsDiv.style.display = 'none';
+                });
+            });
         } else {
             suggestionsDiv.style.display = 'none';
         }
-
-        // Add click handlers to suggestions
-        suggestionsDiv.querySelectorAll('.airport-suggestion').forEach(div => {
-            div.addEventListener('click', () => {
-                const code = div.dataset.code;
-                const city = div.dataset.city;
-                const tripType = tripTypeSelect.value;
-                
-                airportSearch.value = `${code}, ${city}`;
-                suggestionsDiv.style.display = 'none';
-            });
-        });
     });
 
-    // Update full value when trip type changes
+    // Update value when trip type changes
     tripTypeSelect.addEventListener('change', () => {
         if (airportSearch.value) {
-            const [code, city] = airportSearch.value.split(', ');
-            if (city) {
-                airportSearch.value = `${code}, ${city} (${tripTypeSelect.value})`;
-            }
+            const parts = airportSearch.value.split(' (')[0]; // Remove existing trip type if any
+            airportSearch.value = `${parts} (${tripTypeSelect.value})`;
         }
     });
 
     // Close suggestions when clicking outside
     document.addEventListener('click', (e) => {
-        if (!departureWrapper.contains(e.target)) {
+        if (!departureGroup.contains(e.target)) {
             suggestionsDiv.style.display = 'none';
         }
     });
@@ -1141,22 +1124,21 @@ style.textContent = `
         border: 1px solid #ddd;
         border-radius: 4px;
         font-size: 16px;
-        min-width: 300px;
+        min-width: 250px;
     }
 
     .trip-type-select {
-        flex: 1;
+        flex: 0 0 120px;
         padding: 12px;
         border: 1px solid #ddd;
         border-radius: 4px;
         background-color: white;
         font-size: 16px;
-        max-width: 150px;
     }
 
     .airport-suggestions {
         position: absolute;
-        top: 100%;
+        top: calc(100% + 5px);
         left: 0;
         right: 0;
         background: white;
@@ -1175,6 +1157,11 @@ style.textContent = `
         display: flex;
         align-items: center;
         gap: 15px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .airport-suggestion:last-child {
+        border-bottom: none;
     }
 
     .airport-suggestion:hover {
@@ -1201,6 +1188,10 @@ style.textContent = `
 
 // Add the styles to the existing style element
 style.textContent += `
+    .form-group {
+        margin-bottom: 15px;
+    }
+
     .departure-wrapper {
         position: relative;
         display: flex;
@@ -1214,22 +1205,21 @@ style.textContent += `
         border: 1px solid #ddd;
         border-radius: 4px;
         font-size: 16px;
-        min-width: 300px;
+        min-width: 250px;
     }
 
     .trip-type-select {
-        flex: 1;
+        flex: 0 0 120px;
         padding: 12px;
         border: 1px solid #ddd;
         border-radius: 4px;
         background-color: white;
         font-size: 16px;
-        max-width: 150px;
     }
 
     .airport-suggestions {
         position: absolute;
-        top: 100%;
+        top: calc(100% + 5px);
         left: 0;
         right: 0;
         background: white;
@@ -1248,6 +1238,11 @@ style.textContent += `
         display: flex;
         align-items: center;
         gap: 15px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .airport-suggestion:last-child {
+        border-bottom: none;
     }
 
     .airport-suggestion:hover {
