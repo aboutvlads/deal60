@@ -479,8 +479,8 @@ async function initializeForm() {
 
     // Setup destination-based image suggestions
     const destinationInput = document.getElementById('destination');
+    const imageUrlInput = document.getElementById('image_url');
     const screenshotInput = document.getElementById('deal_screenshot');
-    const previewDiv = screenshotInput.nextElementSibling;
     
     // Create and add the suggestion button and container
     const suggestButton = document.createElement('button');
@@ -491,8 +491,8 @@ async function initializeForm() {
     const suggestionContainer = document.createElement('div');
     suggestionContainer.className = 'image-suggestions';
     
-    screenshotInput.parentNode.insertBefore(suggestButton, previewDiv);
-    screenshotInput.parentNode.insertBefore(suggestionContainer, previewDiv);
+    imageUrlInput.parentNode.insertBefore(suggestButton, imageUrlInput.nextSibling);
+    imageUrlInput.parentNode.insertBefore(suggestionContainer, suggestButton.nextSibling);
 
     suggestButton.addEventListener('click', async () => {
         const destination = destinationInput.value;
@@ -527,11 +527,12 @@ async function initializeForm() {
 
     // Add the selectUnsplashImage function to window scope
     window.selectUnsplashImage = (url) => {
-        screenshotInput.value = url;
-        previewDiv.innerHTML = `<img src="${url}" alt="Screenshot preview" onerror="this.src=''; this.alt='Invalid image URL'">`;
+        imageUrlInput.value = url;
         suggestionContainer.innerHTML = ''; // Clear suggestions after selection
     };
 
+    // Setup screenshot preview
+    const previewDiv = screenshotInput.nextElementSibling;
     screenshotInput.addEventListener('input', (e) => {
         const url = e.target.value;
         if (url) {
@@ -540,11 +541,6 @@ async function initializeForm() {
             previewDiv.innerHTML = '';
         }
     });
-
-    // Setup screenshot preview
-    const screenshotPreview = document.createElement('div');
-    screenshotPreview.className = 'upload-preview';
-    screenshotInput.parentNode.insertBefore(screenshotPreview, previewDiv);
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault()
