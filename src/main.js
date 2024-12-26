@@ -409,14 +409,16 @@ const prefillData = {
     price: 299,
     original_price: 599,
     discount: 50,
-    posted_by: 'John Doe',
-    posted_by_avatar: 'https://i.pravatar.cc/150?u=john',
-    posted_by_description: 'Travel Expert',
+    posted_by: 'Vlad',
+    posted_by_avatar: 'https://pbs.twimg.com/profile_images/1861513689720881152/86GYfxoC_400x400.jpg',
+    posted_by_description: 'Deal Hunter',
     url: 'https://example.com',
-    image_url: 'https://example.com/image.jpg',
+    image_url: '',
     is_hot: false,
-    sample_dates: 'Jan 15-22, Feb 1-8',
-    deal_screenshot_url: 'https://example.com/screenshot.jpg'
+    sample_dates: 'Jan 15 - Feb 28',
+    deal_screenshot_url: '',
+    trip_type: 'roundtrip',  // Add default trip type
+    dates: 'Available: Jan-Mar 2024'  // Add default dates
 }
 
 function prefillForm(data = prefillData) {
@@ -577,6 +579,32 @@ async function initializeForm() {
     setupCountrySearch()
     setupPostedByDropdown()
 
+    // Add trip type selector and dates input after the sample dates field
+    const sampleDatesGroup = document.querySelector('input[name="sample_dates"]').closest('.form-group');
+    
+    // Create trip type field
+    const tripTypeGroup = document.createElement('div');
+    tripTypeGroup.className = 'form-group';
+    tripTypeGroup.innerHTML = `
+        <label for="trip_type">Trip Type:</label>
+        <select id="trip_type" name="trip_type" required>
+            <option value="roundtrip">Round Trip</option>
+            <option value="oneway">One Way</option>
+        </select>
+    `;
+    
+    // Create dates field
+    const datesGroup = document.createElement('div');
+    datesGroup.className = 'form-group';
+    datesGroup.innerHTML = `
+        <label for="dates">Dates:</label>
+        <input type="text" id="dates" name="dates" required>
+    `;
+    
+    // Insert new fields after sample dates
+    sampleDatesGroup.parentNode.insertBefore(tripTypeGroup, sampleDatesGroup.nextSibling);
+    sampleDatesGroup.parentNode.insertBefore(datesGroup, tripTypeGroup.nextSibling);
+
     // Setup screenshot upload and URL input
     const screenshotInput = document.getElementById('deal_screenshot');
     const previewDiv = screenshotInput.nextElementSibling;
@@ -701,9 +729,6 @@ async function initializeForm() {
             const travelStops = formData.get('travel_stops')
             const combinedStops = `${travelPeriod} • ${travelStops}`
 
-            // Get screenshot URL directly
-            const deal_screenshot_url = formData.get('deal_screenshot')
-
             const data = {
                 id: formData.get('id'),
                 departure: formData.get('departure'),
@@ -721,7 +746,9 @@ async function initializeForm() {
                 image_url: formData.get('image_url'),
                 is_hot: formData.get('is_hot') === 'on',
                 sample_dates: formData.get('sample_dates'),
-                deal_screenshot_url
+                deal_screenshot_url: formData.get('deal_screenshot'),
+                trip_type: formData.get('trip_type'),  // Add trip type
+                dates: formData.get('dates')  // Add dates
             }
 
             let error;
@@ -841,6 +868,19 @@ document.querySelector('#app').innerHTML = `
         <div class="form-group">
           <label for="sample_dates">Sample Dates:</label>
           <textarea id="sample_dates" name="sample_dates" rows="3" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="trip_type">Trip Type:</label>
+          <select id="trip_type" name="trip_type" required>
+            <option value="roundtrip">Round Trip</option>
+            <option value="oneway">One Way</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="dates">Dates:</label>
+          <input type="text" id="dates" name="dates" required>
         </div>
 
         <div class="form-group">
@@ -1007,44 +1047,22 @@ style.textContent = `
     #deal_screenshot {
         flex: 1;
     }
-`;
 
-// Add the styles to the existing style element
-style.textContent += `
-    .upload-image-btn {
-        margin-left: 8px;
-        padding: 8px 12px;
-        background: #f0f0f0;
+    select#trip_type {
+        width: 100%;
+        padding: 8px;
         border: 1px solid #ddd;
         border-radius: 4px;
-        cursor: pointer;
-        transition: background-color 0.2s;
+        background-color: white;
+        font-size: 16px;
     }
 
-    .upload-image-btn:hover {
-        background: #e0e0e0;
-    }
-
-    .upload-image-btn:disabled {
-        opacity: 0.7;
-        cursor: not-allowed;
-    }
-
-    .loading-spinner {
-        padding: 20px;
-        text-align: center;
-        color: #666;
-    }
-
-    /* Make URL input and upload button appear on the same line */
-    .form-group {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    #deal_screenshot {
-        flex: 1;
+    input#dates {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 16px;
     }
 `;
 
