@@ -393,11 +393,13 @@ function setupDepartureField() {
     departureGroup.innerHTML = `
         <label for="departure">From:</label>
         <div class="departure-wrapper">
-            <input type="text" class="airport-search" id="departure" placeholder="Enter city name" required>
-            <select class="trip-type-select">
-                <option value="Roundtrip">Roundtrip</option>
-                <option value="One Way">One Way</option>
-            </select>
+            <div class="input-column">
+                <input type="text" class="airport-search" id="departure" placeholder="Enter city name" required>
+                <select class="trip-type-select">
+                    <option value="Roundtrip">Roundtrip</option>
+                    <option value="One Way">One Way</option>
+                </select>
+            </div>
             <div class="airport-suggestions"></div>
         </div>
     `;
@@ -862,12 +864,13 @@ document.querySelector('#app').innerHTML = `
         <div class="form-group">
           <label for="departure">From:</label>
           <div class="departure-wrapper">
-            <input type="text" id="departure" name="departure" required>
-            <select class="trip-type-select">
-                <option value="Roundtrip">Roundtrip</option>
-                <option value="One Way">One Way</option>
-            </select>
-            <input type="hidden" id="departure_full" name="departure">
+            <div class="input-column">
+                <input type="text" class="airport-search" id="departure" placeholder="Enter city name" required>
+                <select class="trip-type-select">
+                    <option value="Roundtrip">Roundtrip</option>
+                    <option value="One Way">One Way</option>
+                </select>
+            </div>
             <div class="airport-suggestions"></div>
           </div>
         </div>
@@ -1113,22 +1116,27 @@ style.textContent = `
 
     .departure-wrapper {
         position: relative;
+        width: 100%;
+    }
+
+    .input-column {
         display: flex;
+        flex-direction: column;
         gap: 8px;
         width: 100%;
     }
 
     .airport-search {
-        flex: 2;
+        width: 100%;
         padding: 12px;
         border: 1px solid #ddd;
         border-radius: 4px;
         font-size: 16px;
-        min-width: 250px;
     }
 
     .trip-type-select {
-        flex: 0 0 120px;
+        width: 100%;
+        max-width: 200px;
         padding: 12px;
         border: 1px solid #ddd;
         border-radius: 4px;
@@ -1138,7 +1146,7 @@ style.textContent = `
 
     .airport-suggestions {
         position: absolute;
-        top: calc(100% + 5px);
+        top: 100%;
         left: 0;
         right: 0;
         background: white;
@@ -1149,6 +1157,7 @@ style.textContent = `
         z-index: 1000;
         display: none;
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        margin-top: 8px;
     }
 
     .airport-suggestion {
@@ -1194,22 +1203,27 @@ style.textContent += `
 
     .departure-wrapper {
         position: relative;
+        width: 100%;
+    }
+
+    .input-column {
         display: flex;
+        flex-direction: column;
         gap: 8px;
         width: 100%;
     }
 
     .airport-search {
-        flex: 2;
+        width: 100%;
         padding: 12px;
         border: 1px solid #ddd;
         border-radius: 4px;
         font-size: 16px;
-        min-width: 250px;
     }
 
     .trip-type-select {
-        flex: 0 0 120px;
+        width: 100%;
+        max-width: 200px;
         padding: 12px;
         border: 1px solid #ddd;
         border-radius: 4px;
@@ -1219,7 +1233,7 @@ style.textContent += `
 
     .airport-suggestions {
         position: absolute;
-        top: calc(100% + 5px);
+        top: 100%;
         left: 0;
         right: 0;
         background: white;
@@ -1230,6 +1244,7 @@ style.textContent += `
         z-index: 1000;
         display: none;
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        margin-top: 8px;
     }
 
     .airport-suggestion {
