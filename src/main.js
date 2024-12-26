@@ -770,169 +770,382 @@ document.querySelector('#app').innerHTML = `
   </div>
 `
 
-const style = document.createElement('style');
-style.textContent = `
-    .country-list {
-        display: none;
-        position: absolute;
-        max-height: 200px;
-        overflow-y: auto;
-        background: white;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        z-index: 1000;
-        width: 100%;
+const styles = `
+    :root {
+        --primary-color: #2563eb;
+        --primary-hover: #1d4ed8;
+        --success-color: #22c55e;
+        --danger-color: #ef4444;
+        --border-color: #e5e7eb;
+        --text-color: #1f2937;
+        --background-color: #f9fafb;
+        --card-background: #ffffff;
+        --input-background: #ffffff;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
     }
 
-    .country-item {
-        padding: 8px 12px;
-        cursor: pointer;
-        transition: background-color 0.2s;
-    }
-
-    .country-item:hover {
-        background-color: #f5f5f5;
-    }
-
-    .form-group {
-        position: relative;
-        margin-bottom: 15px;
-    }
-
-    textarea#sample_dates {
-        width: 100%;
-        min-height: 80px;
-        padding: 8px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        resize: vertical;
-    }
-
-    .upload-preview {
-        margin-top: 10px;
-        max-width: 300px;
-    }
-
-    .upload-preview img {
-        max-width: 100%;
-        border-radius: 4px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    .suggest-images-btn {
-        margin: 5px 0;
-        padding: 5px 10px;
-        background: #f0f0f0;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-
-    .suggest-images-btn:disabled {
-        opacity: 0.7;
-        cursor: not-allowed;
-    }
-
-    .image-suggestions {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 10px;
-        margin: 10px 0;
-    }
-
-    .suggestion-item {
-        cursor: pointer;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        overflow: hidden;
-        transition: transform 0.2s;
-    }
-
-    .suggestion-item:hover {
-        transform: scale(1.05);
-    }
-
-    .suggestion-item img {
-        width: 100%;
-        height: 100px;
-        object-fit: cover;
-    }
-
-    .suggestion-item .credit {
-        display: block;
-        font-size: 0.8em;
-        padding: 5px;
-        background: rgba(0,0,0,0.7);
-        color: white;
-    }
-
-    .posted-by-dropdown {
-        width: 100%;
-        padding: 8px;
-        margin-bottom: 10px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        background-color: white;
-        font-size: 16px;
-    }
-
-    .upload-image-btn {
-        margin-left: 8px;
-        padding: 8px 12px;
-        background: #f0f0f0;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: background-color 0.2s;
-    }
-
-    .upload-image-btn:hover {
-        background: #e0e0e0;
-    }
-
-    .upload-image-btn:disabled {
-        opacity: 0.7;
-        cursor: not-allowed;
-    }
-
-    .loading-spinner {
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        line-height: 1.5;
+        color: var(--text-color);
+        background-color: var(--background-color);
+        margin: 0;
         padding: 20px;
-        text-align: center;
-        color: #666;
     }
 
-    /* Make URL input and upload button appear on the same line */
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    #dealForm {
+        background: var(--card-background);
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: var(--shadow-md);
+        margin-bottom: 30px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
     .form-group {
+        margin-bottom: 0;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 500;
+        margin-bottom: 8px;
+        color: var(--text-color);
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="number"],
+    .form-group input[type="url"],
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        background-color: var(--input-background);
+        font-size: 14px;
+        transition: all 0.2s ease;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .checkbox-group {
         display: flex;
         align-items: center;
         gap: 8px;
     }
 
-    #deal_screenshot {
-        flex: 1;
+    .checkbox-group input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        margin-right: 8px;
     }
 
-    select#trip_type {
-        width: 100%;
-        padding: 8px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        background-color: white;
-        font-size: 16px;
+    button {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
     }
 
-    input#dates {
+    button:hover {
+        background-color: var(--primary-hover);
+    }
+
+    .upload-btn,
+    .suggest-images-btn {
+        background-color: var(--primary-color);
+        margin-top: 8px;
+        font-size: 14px;
+    }
+
+    .deals-table-container {
+        background: var(--card-background);
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: var(--shadow-md);
+        overflow-x: auto;
+    }
+
+    .deals-table {
         width: 100%;
-        padding: 8px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        font-size: 16px;
+        border-collapse: collapse;
+        font-size: 14px;
+    }
+
+    .deals-table th {
+        background-color: var(--background-color);
+        padding: 12px 16px;
+        text-align: left;
+        font-weight: 500;
+        border-bottom: 2px solid var(--border-color);
+    }
+
+    .deals-table td {
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border-color);
+        vertical-align: middle;
+    }
+
+    .deals-table tr:hover {
+        background-color: var(--background-color);
+    }
+
+    .price-info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .current-price {
+        font-weight: 600;
+        color: var(--success-color);
+    }
+
+    .original-price {
+        text-decoration: line-through;
+        color: #6b7280;
+        font-size: 12px;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+    }
+
+    .edit-btn,
+    .delete-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+        border-radius: 6px;
+    }
+
+    .edit-btn {
+        background-color: var(--primary-color);
+    }
+
+    .delete-btn {
+        background-color: var(--danger-color);
+    }
+
+    .image-suggestions {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 16px;
+        margin-top: 16px;
+    }
+
+    .image-suggestion {
+        border-radius: 8px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+    }
+
+    .image-suggestion:hover {
+        transform: scale(1.05);
+    }
+
+    .image-suggestion img {
+        width: 100%;
+        height: 100px;
+        object-fit: cover;
+    }
+
+    .upload-preview {
+        margin-top: 8px;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .upload-preview img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding: 10px;
+        }
+
+        #dealForm {
+            padding: 16px;
+        }
+
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .deals-table th,
+        .deals-table td {
+            padding: 8px;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+    }
+
+    /* Loading state styles */
+    .loading {
+        opacity: 0.7;
+        pointer-events: none;
+    }
+
+    .loading button[type="submit"]::after {
+        content: '';
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        margin-left: 8px;
+        border: 2px solid #ffffff;
+        border-radius: 50%;
+        border-top-color: transparent;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
     }
 `;
 
-// Add the styles to the existing style element
-document.head.appendChild(style);
+// Add styles to the document
+const styleSheet = document.createElement('style');
+styleSheet.textContent = styles;
+document.head.appendChild(styleSheet);
+
+// Update the form HTML to use the new grid layout
+const formHtml = `
+    <div class="form-grid">
+        <input type="hidden" id="id" name="id">
+
+        <div class="form-group">
+            <label for="departure">From:</label>
+            <input type="text" id="departure" name="departure" required>
+        </div>
+
+        <div class="form-group">
+            <label for="destination">To:</label>
+            <input type="text" id="destination" name="destination" required>
+        </div>
+
+        <div class="form-group">
+            <label for="country">Country:</label>
+            <input type="text" id="country" name="country" required>
+        </div>
+
+        <div class="form-group">
+            <label for="flag">Flag:</label>
+            <input type="text" id="flag" name="flag" required>
+        </div>
+
+        <div class="form-group">
+            <label for="travel_stops">Stops:</label>
+            <select id="travel_stops" name="travel_stops" required>
+                <option value="Direct">Direct</option>
+                <option value="1 Stop">1 Stop</option>
+                <option value="2+ Stops">2+ Stops</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="price">Price:</label>
+            <input type="number" id="price" name="price" required>
+        </div>
+
+        <div class="form-group">
+            <label for="original_price">Original Price:</label>
+            <input type="number" id="original_price" name="original_price" required>
+        </div>
+
+        <div class="form-group">
+            <label for="posted_by">Posted By:</label>
+            <input type="text" id="posted_by" name="posted_by" required>
+        </div>
+
+        <div class="form-group">
+            <label for="posted_by_avatar">Posted By Avatar:</label>
+            <input type="url" id="posted_by_avatar" name="posted_by_avatar" required>
+        </div>
+
+        <div class="form-group">
+            <label for="posted_by_description">Posted By Description:</label>
+            <input type="text" id="posted_by_description" name="posted_by_description" required>
+        </div>
+
+        <div class="form-group">
+            <label for="url">URL:</label>
+            <input type="url" id="url" name="url" required>
+        </div>
+
+        <div class="form-group">
+            <label for="image_url">Image URL:</label>
+            <input type="url" id="image_url" name="image_url" required>
+            <button type="button" id="suggestImages" class="suggest-images-btn">Suggest Images</button>
+            <div id="imageSuggestions" class="image-suggestions"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="sample_dates">Sample Dates:</label>
+            <textarea id="sample_dates" name="sample_dates" rows="3" required></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="deal_screenshot">Deal Screenshot URL:</label>
+            <input type="url" id="deal_screenshot" name="deal_screenshot" required>
+            <div class="upload-preview"></div>
+            <button type="button" id="uploadScreenshot" class="upload-btn">Upload Screenshot</button>
+        </div>
+
+        <div class="form-group">
+            <label for="trip_type">Trip Type:</label>
+            <select id="trip_type" name="trip_type" required>
+                <option value="roundtrip">Round Trip</option>
+                <option value="oneway">One Way</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="dates">Dates:</label>
+            <input type="text" id="dates" name="dates" required>
+        </div>
+
+        <div class="form-group checkbox-group">
+            <label>
+                <input type="checkbox" id="is_hot" name="is_hot">
+                Hot Deal
+            </label>
+        </div>
+    </div>
+
+    <button type="submit">Add Deal</button>
+`;
 
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', async () => {
