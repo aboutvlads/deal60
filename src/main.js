@@ -24,22 +24,36 @@ async function checkAuth() {
 }
 
 async function login(username, password) {
-    const { data, error } = await supabase
-        .from('admins')
-        .select('username, password')
-        .eq('username', username)
-        .eq('password', password)
-        .maybeSingle()
+    const { data, error } = await supabase.auth.signInWithPassword({
+        email: username + '@temp.com',  // Supabase requires email format
+        password: password
+    })
 
-    if (data) {
+    if (data?.user) {
         isAuthenticated = true
         document.getElementById('loginForm').style.display = 'none'
         document.getElementById('app').style.display = 'block'
         return true
     }
 
+    if (error) {
+        console.error('Error logging in:', error.message)
+    }
     return false
 }
+
+// Initialize auth state
+supabase.auth.onAuthStateChange((event, session) => {
+    if (session) {
+        isAuthenticated = true
+        document.getElementById('loginForm').style.display = 'none'
+        document.getElementById('app').style.display = 'block'
+    } else {
+        isAuthenticated = false
+        document.getElementById('loginForm').style.display = 'flex'
+        document.getElementById('app').style.display = 'none'
+    }
+})
 
 // Add login form HTML before the app div
 document.body.insertAdjacentHTML('afterbegin', `
