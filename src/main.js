@@ -753,6 +753,7 @@ async function initializeForm() {
                 stops: travelStops,
                 price: parseInt(formData.get('price')),
                 original_price: parseInt(formData.get('original_price')),
+                discount: Math.round(((parseInt(formData.get('original_price')) - parseInt(formData.get('price'))) / parseInt(formData.get('original_price'))) * 100),
                 posted_by: formData.get('posted_by'),
                 posted_by_avatar: formData.get('posted_by_avatar'),
                 posted_by_description: formData.get('posted_by_description'),
