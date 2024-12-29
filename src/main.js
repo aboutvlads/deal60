@@ -869,6 +869,11 @@ document.querySelector('#app').innerHTML = `
         <div class="form-group">
           <label for="image_url">Image URL:</label>
           <input type="url" id="image_url" name="image_url" required>
+          <div class="unsplash-search">
+            <input type="text" id="unsplashQuery" placeholder="Custom search term (optional)">
+            <button type="button" onclick="suggestImages()" class="suggest-btn">Suggest Images</button>
+          </div>
+          <div class="image-suggestions"></div>
         </div>
 
         <div class="form-group">
@@ -1186,127 +1191,102 @@ const styles = `
     }
 `;
 
-// Add styles to the document
-const styleSheet = document.createElement('style');
-styleSheet.textContent = styles;
-document.head.appendChild(styleSheet);
+const additionalStyles = `
+    .unsplash-search {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
 
-// Update the form HTML to use the new grid layout
-const formHtml = `
-    <div class="form-grid">
-        <input type="hidden" id="id" name="id">
+    .unsplash-search input {
+        flex: 1;
+        padding: 8px;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+    }
 
-        <div class="form-group">
-            <label for="departure">From:</label>
-            <input type="text" id="departure" name="departure" required placeholder="e.g., JFK, New York">
-        </div>
+    .suggest-btn {
+        padding: 8px 16px;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
 
-        <div class="form-group">
-            <label for="destination">To:</label>
-            <input type="text" id="destination" name="destination" required placeholder="e.g., Paris">
-        </div>
+    .suggest-btn:hover {
+        background-color: var(--primary-hover);
+    }
 
-        <div class="form-group">
-            <label for="country">Country:</label>
-            <input type="text" id="country" name="country" required placeholder="e.g., France">
-        </div>
+    .image-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-top: 10px;
+    }
 
-        <div class="form-group">
-            <label for="flag">Flag:</label>
-            <input type="text" id="flag" name="flag" required>
-        </div>
+    .image-item {
+        cursor: pointer;
+        border-radius: 4px;
+        overflow: hidden;
+        transition: transform 0.2s;
+    }
 
-        <div class="form-group">
-            <label for="travel_stops">Stops:</label>
-            <select id="travel_stops" name="travel_stops" required>
-                <option value="Direct">Direct</option>
-                <option value="1 Stop">1 Stop</option>
-                <option value="2+ Stops">2+ Stops</option>
-            </select>
-        </div>
+    .image-item:hover {
+        transform: scale(1.05);
+    }
 
-        <div class="form-group">
-            <label for="price">Price:</label>
-            <input type="number" id="price" name="price" required>
-        </div>
-
-        <div class="form-group">
-            <label for="original_price">Original Price:</label>
-            <input type="number" id="original_price" name="original_price" required>
-        </div>
-
-        <div class="form-group">
-            <label for="posted_by">Posted By:</label>
-            <input type="text" id="posted_by" name="posted_by" required>
-        </div>
-
-        <div class="form-group">
-            <label for="posted_by_avatar">Posted By Avatar:</label>
-            <input type="url" id="posted_by_avatar" name="posted_by_avatar" required>
-        </div>
-
-        <div class="form-group">
-            <label for="posted_by_description">Posted By Description:</label>
-            <input type="text" id="posted_by_description" name="posted_by_description" required>
-        </div>
-
-        <div class="form-group">
-            <label for="url">URL:</label>
-            <input type="url" id="url" name="url" required>
-        </div>
-
-        <div class="form-group">
-            <label for="image_url">Image URL:</label>
-            <input type="url" id="image_url" name="image_url" required>
-            <button type="button" id="suggestImages" class="suggest-images-btn">Suggest Images</button>
-            <div id="imageSuggestions" class="image-suggestions"></div>
-        </div>
-
-        <div class="form-group">
-            <label for="sample_dates">Sample Dates:</label>
-            <textarea id="sample_dates" name="sample_dates" rows="3" required placeholder="e.g., 31 Dec – 9 Jan&#10;15 – 26 Jan"></textarea>
-        </div>
-
-        <div class="form-group">
-            <label for="deal_screenshot">Deal Screenshot URL:</label>
-            <input type="url" id="deal_screenshot" name="deal_screenshot" required>
-            <div class="upload-preview"></div>
-            <button type="button" id="uploadScreenshot" class="upload-btn">Upload Screenshot</button>
-        </div>
-
-        <div class="form-group">
-            <label for="trip_type">Trip Type:</label>
-            <select id="trip_type" name="trip_type" required>
-                <option value="roundtrip">Round Trip</option>
-                <option value="oneway">One Way</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="dates">Dates:</label>
-            <input type="text" id="dates" name="dates" required placeholder="e.g., May-Jan">
-        </div>
-
-        <div class="form-group">
-            <label for="route">Route:</label>
-            <input type="text" id="route" name="route" required placeholder="e.g., Direct or via specific cities">
-        </div>
-
-        <div class="form-group">
-            <label for="baggage_allowance">Baggage Allowance:</label>
-            <input type="text" id="baggage_allowance" name="baggage_allowance" required placeholder="e.g., 23kg checked bag">
-        </div>
-
-        <div class="form-group checkbox-group">
-            <label>
-                <input type="checkbox" id="is_hot" name="is_hot">
-                Hot Deal
-            </label>
-        </div>
-    </div>
-
-    <button type="submit">Add Deal</button>
+    .image-item img {
+        width: 100%;
+        height: 100px;
+        object-fit: cover;
+    }
 `;
+
+// Add styles to the document
+const styleSheet = document.createElement('style')
+styleSheet.textContent = styles + additionalStyles
+document.head.appendChild(styleSheet)
+
+async function suggestImages() {
+    const customQuery = document.getElementById('unsplashQuery').value.trim();
+    const destination = document.getElementById('destination').value.trim();
+    
+    let searchQuery = customQuery || destination;
+    if (!searchQuery) {
+        alert('Please enter a destination or custom search term');
+        return;
+    }
+
+    // Add travel-related keywords for better results
+    searchQuery = searchQuery + ' travel destination landmark';
+
+    const images = await fetchUnsplashImages(searchQuery);
+    const suggestionsContainer = document.querySelector('.image-suggestions');
+    
+    if (images.length === 0) {
+        suggestionsContainer.innerHTML = '<p>No images found. Try a different search term.</p>';
+        return;
+    }
+
+    suggestionsContainer.innerHTML = `
+        <div class="image-grid">
+            ${images.map(image => `
+                <div class="image-item" onclick="selectUnsplashImage('${image.urls.regular}')">
+                    <img src="${image.urls.thumb}" alt="${image.alt_description || 'Travel destination'}">
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+// Make function available globally
+window.suggestImages = suggestImages;
+window.selectUnsplashImage = function(url) {
+    document.getElementById('image_url').value = url;
+    document.querySelector('.image-suggestions').innerHTML = '';
+    document.getElementById('unsplashQuery').value = '';
+};
 
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', async () => {
