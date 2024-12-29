@@ -24,26 +24,31 @@ async function checkAuth() {
 }
 
 async function login(username, password) {
-    const { data, error } = await supabase
-        .from('admins')
-        .select('*')
-        .eq('username', username)
-        .eq('password', password)
-        .single()
+    try {
+        const { data, error } = await supabase
+            .from('admins')
+            .select('*')
+            .eq('username', username)
+            .eq('password', password)
+            .single()
 
-    if (error) {
-        console.error('Error logging in:', error)
+        if (error) {
+            console.error('Error logging in:', error)
+            return false
+        }
+
+        if (data) {
+            isAuthenticated = true
+            document.getElementById('loginForm').style.display = 'none'
+            document.getElementById('app').style.display = 'block'
+            return true
+        }
+
+        return false
+    } catch (error) {
+        console.error('Error during login:', error)
         return false
     }
-
-    if (data) {
-        isAuthenticated = true
-        document.getElementById('loginForm').style.display = 'none'
-        document.getElementById('app').style.display = 'block'
-        return true
-    }
-
-    return false
 }
 
 // Add login form HTML before the app div
