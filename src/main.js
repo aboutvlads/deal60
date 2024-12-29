@@ -672,17 +672,17 @@ document.querySelector('#app').innerHTML = `
       <div class="form-grid">
         <div class="form-group">
           <label for="departure">From:</label>
-          <input type="text" id="departure" name="departure" required>
+          <input type="text" id="departure" name="departure" required placeholder="e.g., JFK, New York">
         </div>
 
         <div class="form-group">
           <label for="destination">To:</label>
-          <input type="text" id="destination" name="destination" required>
+          <input type="text" id="destination" name="destination" required placeholder="e.g., Paris">
         </div>
 
         <div class="form-group">
           <label for="country">Country:</label>
-          <input type="text" id="country" name="country" required>
+          <input type="text" id="country" name="country" required placeholder="e.g., France">
         </div>
 
         <div class="form-group">
@@ -736,7 +736,7 @@ document.querySelector('#app').innerHTML = `
 
         <div class="form-group">
           <label for="sample_dates">Sample Dates:</label>
-          <textarea id="sample_dates" name="sample_dates" rows="3" required></textarea>
+          <textarea id="sample_dates" name="sample_dates" rows="3" required placeholder="e.g., 31 Dec – 9 Jan&#10;15 – 26 Jan"></textarea>
         </div>
 
         <div class="form-group">
@@ -755,7 +755,7 @@ document.querySelector('#app').innerHTML = `
 
         <div class="form-group">
           <label for="dates">Dates:</label>
-          <input type="text" id="dates" name="dates" required>
+          <input type="text" id="dates" name="dates" required placeholder="e.g., May-Jan">
         </div>
 
         <div class="form-group">
@@ -1061,17 +1061,17 @@ const formHtml = `
 
         <div class="form-group">
             <label for="departure">From:</label>
-            <input type="text" id="departure" name="departure" required>
+            <input type="text" id="departure" name="departure" required placeholder="e.g., JFK, New York">
         </div>
 
         <div class="form-group">
             <label for="destination">To:</label>
-            <input type="text" id="destination" name="destination" required>
+            <input type="text" id="destination" name="destination" required placeholder="e.g., Paris">
         </div>
 
         <div class="form-group">
             <label for="country">Country:</label>
-            <input type="text" id="country" name="country" required>
+            <input type="text" id="country" name="country" required placeholder="e.g., France">
         </div>
 
         <div class="form-group">
@@ -1127,7 +1127,7 @@ const formHtml = `
 
         <div class="form-group">
             <label for="sample_dates">Sample Dates:</label>
-            <textarea id="sample_dates" name="sample_dates" rows="3" required></textarea>
+            <textarea id="sample_dates" name="sample_dates" rows="3" required placeholder="e.g., 31 Dec – 9 Jan&#10;15 – 26 Jan"></textarea>
         </div>
 
         <div class="form-group">
@@ -1147,7 +1147,7 @@ const formHtml = `
 
         <div class="form-group">
             <label for="dates">Dates:</label>
-            <input type="text" id="dates" name="dates" required>
+            <input type="text" id="dates" name="dates" required placeholder="e.g., May-Jan">
         </div>
 
         <div class="form-group">
