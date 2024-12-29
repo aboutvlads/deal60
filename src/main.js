@@ -346,87 +346,36 @@ const countries = [
 ];
 
 const CITY_TO_COUNTRY = {
-    // United Kingdom
-    'london': { country: 'United Kingdom', code: 'GB' },
-    'manchester': { country: 'United Kingdom', code: 'GB' },
-    'edinburgh': { country: 'United Kingdom', code: 'GB' },
-    
-    // France
     'paris': { country: 'France', code: 'FR' },
-    'nice': { country: 'France', code: 'FR' },
-    'lyon': { country: 'France', code: 'FR' },
-    
-    // Turkey
-    'istanbul': { country: 'Turkey', code: 'TR' },
-    'antalya': { country: 'Turkey', code: 'TR' },
-    'dalaman': { country: 'Turkey', code: 'TR' },
-    'bodrum': { country: 'Turkey', code: 'TR' },
-    'izmir': { country: 'Turkey', code: 'TR' },
-    'alanya': { country: 'Turkey', code: 'TR' },
-    
-    // Spain
-    'madrid': { country: 'Spain', code: 'ES' },
-    'barcelona': { country: 'Spain', code: 'ES' },
-    'malaga': { country: 'Spain', code: 'ES' },
-    'alicante': { country: 'Spain', code: 'ES' },
-    'valencia': { country: 'Spain', code: 'ES' },
-    'palma': { country: 'Spain', code: 'ES' },
-    'ibiza': { country: 'Spain', code: 'ES' },
-    'tenerife': { country: 'Spain', code: 'ES' },
-    
-    // Italy
-    'rome': { country: 'Italy', code: 'IT' },
-    'milan': { country: 'Italy', code: 'IT' },
-    'venice': { country: 'Italy', code: 'IT' },
-    'florence': { country: 'Italy', code: 'IT' },
-    'naples': { country: 'Italy', code: 'IT' },
-    
-    // Greece
-    'athens': { country: 'Greece', code: 'GR' },
-    'thessaloniki': { country: 'Greece', code: 'GR' },
-    'rhodes': { country: 'Greece', code: 'GR' },
-    'crete': { country: 'Greece', code: 'GR' },
-    'santorini': { country: 'Greece', code: 'GR' },
-    'corfu': { country: 'Greece', code: 'GR' },
-    'kos': { country: 'Greece', code: 'GR' },
-    
-    // Portugal
-    'lisbon': { country: 'Portugal', code: 'PT' },
-    'porto': { country: 'Portugal', code: 'PT' },
-    'faro': { country: 'Portugal', code: 'PT' },
-    
-    // Germany
-    'berlin': { country: 'Germany', code: 'DE' },
-    'munich': { country: 'Germany', code: 'DE' },
-    'frankfurt': { country: 'Germany', code: 'DE' },
-    'hamburg': { country: 'Germany', code: 'DE' },
-    
-    // Netherlands
-    'amsterdam': { country: 'Netherlands', code: 'NL' },
-    'rotterdam': { country: 'Netherlands', code: 'NL' },
-    
-    // USA
+    'london': { country: 'United Kingdom', code: 'GB' },
     'new york': { country: 'United States', code: 'US' },
-    'los angeles': { country: 'United States', code: 'US' },
-    'miami': { country: 'United States', code: 'US' },
-    'san francisco': { country: 'United States', code: 'US' },
-    'las vegas': { country: 'United States', code: 'US' },
-    'orlando': { country: 'United States', code: 'US' },
-    'boston': { country: 'United States', code: 'US' },
-    'chicago': { country: 'United States', code: 'US' },
-    
-    // Thailand
+    'tokyo': { country: 'Japan', code: 'JP' },
+    'rome': { country: 'Italy', code: 'IT' },
+    'berlin': { country: 'Germany', code: 'DE' },
+    'madrid': { country: 'Spain', code: 'ES' },
+    'amsterdam': { country: 'Netherlands', code: 'NL' },
     'bangkok': { country: 'Thailand', code: 'TH' },
-    'phuket': { country: 'Thailand', code: 'TH' },
-    'koh samui': { country: 'Thailand', code: 'TH' },
-    
-    // Indonesia
-    'bali': { country: 'Indonesia', code: 'ID' },
-    'jakarta': { country: 'Indonesia', code: 'ID' },
-    
-    // UAE
     'dubai': { country: 'United Arab Emirates', code: 'AE' },
-    'abu dhabi': { country: 'United Arab Emirates', code: 'AE' }
+    'singapore': { country: 'Singapore', code: 'SG' },
+    'sydney': { country: 'Australia', code: 'AU' },
+    'istanbul': { country: 'Turkey', code: 'TR' },
+    'moscow': { country: 'Russia', code: 'RU' },
+    'beijing': { country: 'China', code: 'CN' },
+    'seoul': { country: 'South Korea', code: 'KR' },
+    'vienna': { country: 'Austria', code: 'AT' },
+    'prague': { country: 'Czech Republic', code: 'CZ' },
+    'lisbon': { country: 'Portugal', code: 'PT' },
+    'athens': { country: 'Greece', code: 'GR' },
+    'venice': { country: 'Italy', code: 'IT' },
+    'barcelona': { country: 'Spain', code: 'ES' },
+    'milan': { country: 'Italy', code: 'IT' },
+    'munich': { country: 'Germany', code: 'DE' },
+    'zurich': { country: 'Switzerland', code: 'CH' },
+    'stockholm': { country: 'Sweden', code: 'SE' },
+    'oslo': { country: 'Norway', code: 'NO' },
+    'copenhagen': { country: 'Denmark', code: 'DK' },
+    'dublin': { country: 'Ireland', code: 'IE' },
+    'brussels': { country: 'Belgium', code: 'BE' }
 };
 
 const PREDEFINED_USERS = [
@@ -751,50 +700,34 @@ async function initializeForm() {
     imageUrlInput.parentNode.insertBefore(suggestionContainer, suggestButton.nextSibling);
 
     suggestButton.addEventListener('click', async () => {
-        const customQuery = document.getElementById('unsplashQuery').value.trim();
-        const destination = document.getElementById('destination').value.trim().toLowerCase();
-        
-        let searchQuery = customQuery;
-        
-        if (!searchQuery) {
-            // Try to find the city in our mapping
-            const destinationParts = destination.split(',')[0].trim().toLowerCase();
-            
-            if (CITY_TO_COUNTRY[destinationParts]) {
-                // If it's a known city, use both city and country for better results
-                const cityData = CITY_TO_COUNTRY[destinationParts];
-                searchQuery = `${destinationParts} ${cityData.country}`;
-            } else {
-                // If it's not in our mapping, just use the destination as is
-                searchQuery = destination;
-            }
-        }
-
-        if (!searchQuery) {
-            alert('Please enter a destination or custom search term');
+        const destination = destinationInput.value;
+        if (!destination) {
+            alert('Please enter a destination first');
             return;
         }
 
-        // Add travel-related keywords for better results
-        searchQuery = `${searchQuery} travel destination landmark tourism`;
+        suggestButton.disabled = true;
+        suggestButton.textContent = 'Loading...';
+        suggestionContainer.innerHTML = 'Loading suggestions...';
 
-        const images = await fetchUnsplashImages(searchQuery);
-        const suggestionsContainer = document.querySelector('.image-suggestions');
+        const images = await fetchUnsplashImages(destination + ' city');
         
         if (images.length === 0) {
-            suggestionsContainer.innerHTML = '<p>No images found. Try a different search term.</p>';
+            suggestionContainer.innerHTML = 'No images found. Try a different destination.';
+            suggestButton.disabled = false;
+            suggestButton.textContent = '🖼 Suggest Images';
             return;
         }
 
-        suggestionsContainer.innerHTML = `
-            <div class="image-grid">
-                ${images.map(image => `
-                    <div class="image-item" onclick="selectUnsplashImage('${image.urls.regular}')">
-                        <img src="${image.urls.thumb}" alt="${image.alt_description || 'Travel destination'}">
-                    </div>
-                `).join('')}
+        suggestionContainer.innerHTML = images.map(img => `
+            <div class="suggestion-item" onclick="selectUnsplashImage('${img.urls.regular}')">
+                <img src="${img.urls.thumb}" alt="${img.alt_description || destination}">
+                <span class="credit">Photo by ${img.user.name} on Unsplash</span>
             </div>
-        `;
+        `).join('');
+
+        suggestButton.disabled = false;
+        suggestButton.textContent = '🖼 Suggest Images';
     });
 
     // Add the selectUnsplashImage function to window scope
@@ -936,11 +869,6 @@ document.querySelector('#app').innerHTML = `
         <div class="form-group">
           <label for="image_url">Image URL:</label>
           <input type="url" id="image_url" name="image_url" required>
-          <div class="unsplash-search">
-            <input type="text" id="unsplashQuery" placeholder="Custom search term (optional)">
-            <button type="button" onclick="suggestImages()" class="suggest-btn">Suggest Images</button>
-          </div>
-          <div class="image-suggestions"></div>
         </div>
 
         <div class="form-group">
@@ -1258,117 +1186,127 @@ const styles = `
     }
 `;
 
-const additionalStyles = `
-    .unsplash-search {
-        display: flex;
-        gap: 10px;
-        margin-top: 10px;
-    }
-
-    .unsplash-search input {
-        flex: 1;
-        padding: 8px;
-        border: 1px solid var(--border-color);
-        border-radius: 4px;
-    }
-
-    .suggest-btn {
-        padding: 8px 16px;
-        background-color: var(--primary-color);
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-
-    .suggest-btn:hover {
-        background-color: var(--primary-hover);
-    }
-
-    .image-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 10px;
-        margin-top: 10px;
-    }
-
-    .image-item {
-        cursor: pointer;
-        border-radius: 4px;
-        overflow: hidden;
-        transition: transform 0.2s;
-    }
-
-    .image-item:hover {
-        transform: scale(1.05);
-    }
-
-    .image-item img {
-        width: 100%;
-        height: 100px;
-        object-fit: cover;
-    }
-`;
-
 // Add styles to the document
-const styleSheet = document.createElement('style')
-styleSheet.textContent = styles + additionalStyles
-document.head.appendChild(styleSheet)
+const styleSheet = document.createElement('style');
+styleSheet.textContent = styles;
+document.head.appendChild(styleSheet);
 
-async function suggestImages() {
-    const customQuery = document.getElementById('unsplashQuery').value.trim();
-    const destination = document.getElementById('destination').value.trim().toLowerCase();
-    
-    let searchQuery = customQuery;
-    
-    if (!searchQuery) {
-        // Try to find the city in our mapping
-        const destinationParts = destination.split(',')[0].trim().toLowerCase();
-        
-        if (CITY_TO_COUNTRY[destinationParts]) {
-            // If it's a known city, use both city and country for better results
-            const cityData = CITY_TO_COUNTRY[destinationParts];
-            searchQuery = `${destinationParts} ${cityData.country}`;
-        } else {
-            // If it's not in our mapping, just use the destination as is
-            searchQuery = destination;
-        }
-    }
+// Update the form HTML to use the new grid layout
+const formHtml = `
+    <div class="form-grid">
+        <input type="hidden" id="id" name="id">
 
-    if (!searchQuery) {
-        alert('Please enter a destination or custom search term');
-        return;
-    }
-
-    // Add travel-related keywords for better results
-    searchQuery = `${searchQuery} travel destination landmark tourism`;
-
-    const images = await fetchUnsplashImages(searchQuery);
-    const suggestionsContainer = document.querySelector('.image-suggestions');
-    
-    if (images.length === 0) {
-        suggestionsContainer.innerHTML = '<p>No images found. Try a different search term.</p>';
-        return;
-    }
-
-    suggestionsContainer.innerHTML = `
-        <div class="image-grid">
-            ${images.map(image => `
-                <div class="image-item" onclick="selectUnsplashImage('${image.urls.regular}')">
-                    <img src="${image.urls.thumb}" alt="${image.alt_description || 'Travel destination'}">
-                </div>
-            `).join('')}
+        <div class="form-group">
+            <label for="departure">From:</label>
+            <input type="text" id="departure" name="departure" required placeholder="e.g., JFK, New York">
         </div>
-    `;
-}
 
-// Make function available globally
-window.suggestImages = suggestImages;
-window.selectUnsplashImage = function(url) {
-    document.getElementById('image_url').value = url;
-    document.querySelector('.image-suggestions').innerHTML = '';
-    document.getElementById('unsplashQuery').value = '';
-};
+        <div class="form-group">
+            <label for="destination">To:</label>
+            <input type="text" id="destination" name="destination" required placeholder="e.g., Paris">
+        </div>
+
+        <div class="form-group">
+            <label for="country">Country:</label>
+            <input type="text" id="country" name="country" required placeholder="e.g., France">
+        </div>
+
+        <div class="form-group">
+            <label for="flag">Flag:</label>
+            <input type="text" id="flag" name="flag" required>
+        </div>
+
+        <div class="form-group">
+            <label for="travel_stops">Stops:</label>
+            <select id="travel_stops" name="travel_stops" required>
+                <option value="Direct">Direct</option>
+                <option value="1 Stop">1 Stop</option>
+                <option value="2+ Stops">2+ Stops</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="price">Price:</label>
+            <input type="number" id="price" name="price" required>
+        </div>
+
+        <div class="form-group">
+            <label for="original_price">Original Price:</label>
+            <input type="number" id="original_price" name="original_price" required>
+        </div>
+
+        <div class="form-group">
+            <label for="posted_by">Posted By:</label>
+            <input type="text" id="posted_by" name="posted_by" required>
+        </div>
+
+        <div class="form-group">
+            <label for="posted_by_avatar">Posted By Avatar:</label>
+            <input type="url" id="posted_by_avatar" name="posted_by_avatar" required>
+        </div>
+
+        <div class="form-group">
+            <label for="posted_by_description">Posted By Description:</label>
+            <input type="text" id="posted_by_description" name="posted_by_description" required>
+        </div>
+
+        <div class="form-group">
+            <label for="url">URL:</label>
+            <input type="url" id="url" name="url" required>
+        </div>
+
+        <div class="form-group">
+            <label for="image_url">Image URL:</label>
+            <input type="url" id="image_url" name="image_url" required>
+            <button type="button" id="suggestImages" class="suggest-images-btn">Suggest Images</button>
+            <div id="imageSuggestions" class="image-suggestions"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="sample_dates">Sample Dates:</label>
+            <textarea id="sample_dates" name="sample_dates" rows="3" required placeholder="e.g., 31 Dec – 9 Jan&#10;15 – 26 Jan"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="deal_screenshot">Deal Screenshot URL:</label>
+            <input type="url" id="deal_screenshot" name="deal_screenshot" required>
+            <div class="upload-preview"></div>
+            <button type="button" id="uploadScreenshot" class="upload-btn">Upload Screenshot</button>
+        </div>
+
+        <div class="form-group">
+            <label for="trip_type">Trip Type:</label>
+            <select id="trip_type" name="trip_type" required>
+                <option value="roundtrip">Round Trip</option>
+                <option value="oneway">One Way</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="dates">Dates:</label>
+            <input type="text" id="dates" name="dates" required placeholder="e.g., May-Jan">
+        </div>
+
+        <div class="form-group">
+            <label for="route">Route:</label>
+            <input type="text" id="route" name="route" required placeholder="e.g., Direct or via specific cities">
+        </div>
+
+        <div class="form-group">
+            <label for="baggage_allowance">Baggage Allowance:</label>
+            <input type="text" id="baggage_allowance" name="baggage_allowance" required placeholder="e.g., 23kg checked bag">
+        </div>
+
+        <div class="form-group checkbox-group">
+            <label>
+                <input type="checkbox" id="is_hot" name="is_hot">
+                Hot Deal
+            </label>
+        </div>
+    </div>
+
+    <button type="submit">Add Deal</button>
+`;
 
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', async () => {
