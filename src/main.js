@@ -6,6 +6,134 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJ
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
+let isAuthenticated = false;
+
+async function checkAuth() {
+    const { data, error } = await supabase
+        .from('admins')
+        .select('*')
+        .eq('username', 'aboutvlad')
+        .single()
+
+    if (error) {
+        console.error('Error checking auth:', error)
+        return false
+    }
+
+    return data !== null
+}
+
+async function login(username, password) {
+    const { data, error } = await supabase
+        .from('admins')
+        .select('*')
+        .eq('username', username)
+        .eq('password', password)
+        .single()
+
+    if (error) {
+        console.error('Error logging in:', error)
+        return false
+    }
+
+    if (data) {
+        isAuthenticated = true
+        document.getElementById('loginForm').style.display = 'none'
+        document.getElementById('app').style.display = 'block'
+        return true
+    }
+
+    return false
+}
+
+// Add login form HTML before the app div
+document.body.insertAdjacentHTML('afterbegin', `
+    <div id="loginForm" class="login-container">
+        <div class="login-form">
+            <h2>Login to Deals Manager</h2>
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" required>
+            </div>
+            <button id="loginButton" class="login-btn">Login</button>
+            <p id="loginError" class="error-message" style="display: none; color: red; margin-top: 10px;"></p>
+        </div>
+    </div>
+`)
+
+// Add login styles
+const loginStyles = `
+    .login-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background-color: var(--background-color);
+    }
+
+    .login-form {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: var(--shadow-md);
+        width: 100%;
+        max-width: 400px;
+    }
+
+    .login-form h2 {
+        margin-bottom: 1.5rem;
+        text-align: center;
+        color: var(--text-color);
+    }
+
+    .login-btn {
+        width: 100%;
+        padding: 0.75rem;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1rem;
+        margin-top: 1rem;
+    }
+
+    .login-btn:hover {
+        background-color: var(--primary-hover);
+    }
+`
+
+// Add login styles to the document
+const loginStyleSheet = document.createElement('style')
+loginStyleSheet.textContent = loginStyles
+document.head.appendChild(loginStyleSheet)
+
+// Hide the main app initially
+document.getElementById('app').style.display = 'none'
+
+// Add login form event listener
+document.getElementById('loginButton').addEventListener('click', async () => {
+    const username = document.getElementById('username').value
+    const password = document.getElementById('password').value
+    const errorElement = document.getElementById('loginError')
+
+    if (!username || !password) {
+        errorElement.textContent = 'Please enter both username and password'
+        errorElement.style.display = 'block'
+        return
+    }
+
+    const success = await login(username, password)
+    if (!success) {
+        errorElement.textContent = 'Invalid username or password'
+        errorElement.style.display = 'block'
+    }
+})
+
 const UNSPLASH_ACCESS_KEY = 'JLkM54mnaCL1pz6-FggtyOZNIV7B7p6cNFx8wmCFR-0'; // You'll need to replace this with a real Unsplash API key
 
 let isEditing = false;
