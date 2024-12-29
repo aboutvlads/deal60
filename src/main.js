@@ -346,36 +346,87 @@ const countries = [
 ];
 
 const CITY_TO_COUNTRY = {
-    'paris': { country: 'France', code: 'FR' },
+    // United Kingdom
     'london': { country: 'United Kingdom', code: 'GB' },
-    'new york': { country: 'United States', code: 'US' },
-    'tokyo': { country: 'Japan', code: 'JP' },
-    'rome': { country: 'Italy', code: 'IT' },
-    'berlin': { country: 'Germany', code: 'DE' },
-    'madrid': { country: 'Spain', code: 'ES' },
-    'amsterdam': { country: 'Netherlands', code: 'NL' },
-    'bangkok': { country: 'Thailand', code: 'TH' },
-    'dubai': { country: 'United Arab Emirates', code: 'AE' },
-    'singapore': { country: 'Singapore', code: 'SG' },
-    'sydney': { country: 'Australia', code: 'AU' },
+    'manchester': { country: 'United Kingdom', code: 'GB' },
+    'edinburgh': { country: 'United Kingdom', code: 'GB' },
+    
+    // France
+    'paris': { country: 'France', code: 'FR' },
+    'nice': { country: 'France', code: 'FR' },
+    'lyon': { country: 'France', code: 'FR' },
+    
+    // Turkey
     'istanbul': { country: 'Turkey', code: 'TR' },
-    'moscow': { country: 'Russia', code: 'RU' },
-    'beijing': { country: 'China', code: 'CN' },
-    'seoul': { country: 'South Korea', code: 'KR' },
-    'vienna': { country: 'Austria', code: 'AT' },
-    'prague': { country: 'Czech Republic', code: 'CZ' },
-    'lisbon': { country: 'Portugal', code: 'PT' },
-    'athens': { country: 'Greece', code: 'GR' },
-    'venice': { country: 'Italy', code: 'IT' },
+    'antalya': { country: 'Turkey', code: 'TR' },
+    'dalaman': { country: 'Turkey', code: 'TR' },
+    'bodrum': { country: 'Turkey', code: 'TR' },
+    'izmir': { country: 'Turkey', code: 'TR' },
+    'alanya': { country: 'Turkey', code: 'TR' },
+    
+    // Spain
+    'madrid': { country: 'Spain', code: 'ES' },
     'barcelona': { country: 'Spain', code: 'ES' },
+    'malaga': { country: 'Spain', code: 'ES' },
+    'alicante': { country: 'Spain', code: 'ES' },
+    'valencia': { country: 'Spain', code: 'ES' },
+    'palma': { country: 'Spain', code: 'ES' },
+    'ibiza': { country: 'Spain', code: 'ES' },
+    'tenerife': { country: 'Spain', code: 'ES' },
+    
+    // Italy
+    'rome': { country: 'Italy', code: 'IT' },
     'milan': { country: 'Italy', code: 'IT' },
+    'venice': { country: 'Italy', code: 'IT' },
+    'florence': { country: 'Italy', code: 'IT' },
+    'naples': { country: 'Italy', code: 'IT' },
+    
+    // Greece
+    'athens': { country: 'Greece', code: 'GR' },
+    'thessaloniki': { country: 'Greece', code: 'GR' },
+    'rhodes': { country: 'Greece', code: 'GR' },
+    'crete': { country: 'Greece', code: 'GR' },
+    'santorini': { country: 'Greece', code: 'GR' },
+    'corfu': { country: 'Greece', code: 'GR' },
+    'kos': { country: 'Greece', code: 'GR' },
+    
+    // Portugal
+    'lisbon': { country: 'Portugal', code: 'PT' },
+    'porto': { country: 'Portugal', code: 'PT' },
+    'faro': { country: 'Portugal', code: 'PT' },
+    
+    // Germany
+    'berlin': { country: 'Germany', code: 'DE' },
     'munich': { country: 'Germany', code: 'DE' },
-    'zurich': { country: 'Switzerland', code: 'CH' },
-    'stockholm': { country: 'Sweden', code: 'SE' },
-    'oslo': { country: 'Norway', code: 'NO' },
-    'copenhagen': { country: 'Denmark', code: 'DK' },
-    'dublin': { country: 'Ireland', code: 'IE' },
-    'brussels': { country: 'Belgium', code: 'BE' }
+    'frankfurt': { country: 'Germany', code: 'DE' },
+    'hamburg': { country: 'Germany', code: 'DE' },
+    
+    // Netherlands
+    'amsterdam': { country: 'Netherlands', code: 'NL' },
+    'rotterdam': { country: 'Netherlands', code: 'NL' },
+    
+    // USA
+    'new york': { country: 'United States', code: 'US' },
+    'los angeles': { country: 'United States', code: 'US' },
+    'miami': { country: 'United States', code: 'US' },
+    'san francisco': { country: 'United States', code: 'US' },
+    'las vegas': { country: 'United States', code: 'US' },
+    'orlando': { country: 'United States', code: 'US' },
+    'boston': { country: 'United States', code: 'US' },
+    'chicago': { country: 'United States', code: 'US' },
+    
+    // Thailand
+    'bangkok': { country: 'Thailand', code: 'TH' },
+    'phuket': { country: 'Thailand', code: 'TH' },
+    'koh samui': { country: 'Thailand', code: 'TH' },
+    
+    // Indonesia
+    'bali': { country: 'Indonesia', code: 'ID' },
+    'jakarta': { country: 'Indonesia', code: 'ID' },
+    
+    // UAE
+    'dubai': { country: 'United Arab Emirates', code: 'AE' },
+    'abu dhabi': { country: 'United Arab Emirates', code: 'AE' }
 };
 
 const PREDEFINED_USERS = [
@@ -700,34 +751,50 @@ async function initializeForm() {
     imageUrlInput.parentNode.insertBefore(suggestionContainer, suggestButton.nextSibling);
 
     suggestButton.addEventListener('click', async () => {
-        const destination = destinationInput.value;
-        if (!destination) {
-            alert('Please enter a destination first');
+        const customQuery = document.getElementById('unsplashQuery').value.trim();
+        const destination = document.getElementById('destination').value.trim().toLowerCase();
+        
+        let searchQuery = customQuery;
+        
+        if (!searchQuery) {
+            // Try to find the city in our mapping
+            const destinationParts = destination.split(',')[0].trim().toLowerCase();
+            
+            if (CITY_TO_COUNTRY[destinationParts]) {
+                // If it's a known city, use both city and country for better results
+                const cityData = CITY_TO_COUNTRY[destinationParts];
+                searchQuery = `${destinationParts} ${cityData.country}`;
+            } else {
+                // If it's not in our mapping, just use the destination as is
+                searchQuery = destination;
+            }
+        }
+
+        if (!searchQuery) {
+            alert('Please enter a destination or custom search term');
             return;
         }
 
-        suggestButton.disabled = true;
-        suggestButton.textContent = 'Loading...';
-        suggestionContainer.innerHTML = 'Loading suggestions...';
+        // Add travel-related keywords for better results
+        searchQuery = `${searchQuery} travel destination landmark tourism`;
 
-        const images = await fetchUnsplashImages(destination + ' city');
+        const images = await fetchUnsplashImages(searchQuery);
+        const suggestionsContainer = document.querySelector('.image-suggestions');
         
         if (images.length === 0) {
-            suggestionContainer.innerHTML = 'No images found. Try a different destination.';
-            suggestButton.disabled = false;
-            suggestButton.textContent = '🖼 Suggest Images';
+            suggestionsContainer.innerHTML = '<p>No images found. Try a different search term.</p>';
             return;
         }
 
-        suggestionContainer.innerHTML = images.map(img => `
-            <div class="suggestion-item" onclick="selectUnsplashImage('${img.urls.regular}')">
-                <img src="${img.urls.thumb}" alt="${img.alt_description || destination}">
-                <span class="credit">Photo by ${img.user.name} on Unsplash</span>
+        suggestionsContainer.innerHTML = `
+            <div class="image-grid">
+                ${images.map(image => `
+                    <div class="image-item" onclick="selectUnsplashImage('${image.urls.regular}')">
+                        <img src="${image.urls.thumb}" alt="${image.alt_description || 'Travel destination'}">
+                    </div>
+                `).join('')}
             </div>
-        `).join('');
-
-        suggestButton.disabled = false;
-        suggestButton.textContent = '🖼 Suggest Images';
+        `;
     });
 
     // Add the selectUnsplashImage function to window scope
@@ -1250,16 +1317,31 @@ document.head.appendChild(styleSheet)
 
 async function suggestImages() {
     const customQuery = document.getElementById('unsplashQuery').value.trim();
-    const destination = document.getElementById('destination').value.trim();
+    const destination = document.getElementById('destination').value.trim().toLowerCase();
     
-    let searchQuery = customQuery || destination;
+    let searchQuery = customQuery;
+    
+    if (!searchQuery) {
+        // Try to find the city in our mapping
+        const destinationParts = destination.split(',')[0].trim().toLowerCase();
+        
+        if (CITY_TO_COUNTRY[destinationParts]) {
+            // If it's a known city, use both city and country for better results
+            const cityData = CITY_TO_COUNTRY[destinationParts];
+            searchQuery = `${destinationParts} ${cityData.country}`;
+        } else {
+            // If it's not in our mapping, just use the destination as is
+            searchQuery = destination;
+        }
+    }
+
     if (!searchQuery) {
         alert('Please enter a destination or custom search term');
         return;
     }
 
     // Add travel-related keywords for better results
-    searchQuery = searchQuery + ' travel destination landmark';
+    searchQuery = `${searchQuery} travel destination landmark tourism`;
 
     const images = await fetchUnsplashImages(searchQuery);
     const suggestionsContainer = document.querySelector('.image-suggestions');
