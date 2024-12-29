@@ -470,7 +470,9 @@ const prefillData = {
     sample_dates: '',
     deal_screenshot_url: '',
     trip_type: 'roundtrip',
-    dates: ''
+    dates: '',
+    route: '',
+    baggage_allowance: ''
 }
 
 async function initializeForm() {
@@ -623,7 +625,9 @@ async function initializeForm() {
                 sample_dates: formData.get('sample_dates'),
                 deal_screenshot_url: formData.get('deal_screenshot'),
                 trip_type: formData.get('trip_type'),
-                dates: formData.get('dates')
+                dates: formData.get('dates'),
+                route: formData.get('route'),
+                baggage_allowance: formData.get('baggage_allowance')
             }
 
             let error;
@@ -752,6 +756,16 @@ document.querySelector('#app').innerHTML = `
         <div class="form-group">
           <label for="dates">Dates:</label>
           <input type="text" id="dates" name="dates" required>
+        </div>
+
+        <div class="form-group">
+          <label for="route">Route:</label>
+          <input type="text" id="route" name="route" required placeholder="e.g., Direct or via specific cities">
+        </div>
+
+        <div class="form-group">
+          <label for="baggage_allowance">Baggage Allowance:</label>
+          <input type="text" id="baggage_allowance" name="baggage_allowance" required placeholder="e.g., 23kg checked bag">
         </div>
 
         <div class="form-group checkbox-group">
@@ -1136,6 +1150,16 @@ const formHtml = `
             <input type="text" id="dates" name="dates" required>
         </div>
 
+        <div class="form-group">
+            <label for="route">Route:</label>
+            <input type="text" id="route" name="route" required placeholder="e.g., Direct or via specific cities">
+        </div>
+
+        <div class="form-group">
+            <label for="baggage_allowance">Baggage Allowance:</label>
+            <input type="text" id="baggage_allowance" name="baggage_allowance" required placeholder="e.g., 23kg checked bag">
+        </div>
+
         <div class="form-group checkbox-group">
             <label>
                 <input type="checkbox" id="is_hot" name="is_hot">
@@ -1199,6 +1223,8 @@ async function displayDeals() {
                             <th>Price</th>
                             <th>From</th>
                             <th>Trip Type</th>
+                            <th>Route</th>
+                            <th>Baggage</th>
                             <th>Dates</th>
                             <th>Screenshot</th>
                             <th>Created</th>
@@ -1217,6 +1243,8 @@ async function displayDeals() {
                                 </td>
                                 <td>${deal.departure}</td>
                                 <td>${deal.trip_type === 'roundtrip' ? 'Round Trip' : 'One Way'}</td>
+                                <td>${deal.route || 'N/A'}</td>
+                                <td>${deal.baggage_allowance || 'N/A'}</td>
                                 <td>${deal.dates || 'N/A'}</td>
                                 <td>${deal.deal_screenshot_url ? `<a href="${deal.deal_screenshot_url}" target="_blank">View</a>` : 'N/A'}</td>
                                 <td>${formatDate(deal.created_at)}</td>
