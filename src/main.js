@@ -25,6 +25,8 @@ async function checkAuth() {
 
 async function login(username, password) {
     try {
+        console.log('Attempting login with:', { username })
+        
         const { data, error } = await supabase
             .from('admins')
             .select('*')
@@ -32,18 +34,22 @@ async function login(username, password) {
             .eq('password', password)
             .single()
 
+        console.log('Supabase response:', { data, error })
+
         if (error) {
             console.error('Error logging in:', error)
             return false
         }
 
         if (data) {
+            console.log('Login successful:', data)
             isAuthenticated = true
             document.getElementById('loginForm').style.display = 'none'
             document.getElementById('app').style.display = 'block'
             return true
         }
 
+        console.log('No matching credentials found')
         return false
     } catch (error) {
         console.error('Error during login:', error)
@@ -122,9 +128,11 @@ document.getElementById('app').style.display = 'none'
 
 // Add login form event listener
 document.getElementById('loginButton').addEventListener('click', async () => {
-    const username = document.getElementById('username').value
-    const password = document.getElementById('password').value
+    const username = document.getElementById('username').value.trim()
+    const password = document.getElementById('password').value.trim()
     const errorElement = document.getElementById('loginError')
+
+    console.log('Login button clicked')
 
     if (!username || !password) {
         errorElement.textContent = 'Please enter both username and password'
@@ -365,13 +373,13 @@ const CITY_TO_COUNTRY = {
     'venice': { country: 'Italy', code: 'IT' },
     'barcelona': { country: 'Spain', code: 'ES' },
     'milan': { country: 'Italy', code: 'IT' },
-    'munich': { country: 'Germany', code: 'DE' },
-    'zurich': { country: 'Switzerland', code: 'CH' },
-    'stockholm': { country: 'Sweden', code: 'SE' },
-    'oslo': { country: 'Norway', code: 'NO' },
-    'copenhagen': { country: 'Denmark', code: 'DK' },
-    'dublin': { country: 'Ireland', code: 'IE' },
-    'brussels': { country: 'Belgium', code: 'BE' }
+    { name: 'munich': { country: 'Germany', code: 'DE' },
+    { name: 'zurich': { country: 'Switzerland', code: 'CH' },
+    { name: 'stockholm': { country: 'Sweden', code: 'SE' },
+    { name: 'oslo': { country: 'Norway', code: 'NO' },
+    { name: 'copenhagen': { country: 'Denmark', code: 'DK' },
+    { name: 'dublin': { country: 'Ireland', code: 'IE' },
+    { name: 'brussels': { country: 'Belgium', code: 'BE' }
 };
 
 const PREDEFINED_USERS = [
