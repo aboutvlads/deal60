@@ -369,7 +369,7 @@ const CITY_TO_COUNTRY = {
     'venice': { country: 'Italy', code: 'IT' },
     'barcelona': { country: 'Spain', code: 'ES' },
     'milan': { country: 'Italy', code: 'IT' },
-    { name: 'Munich', code: 'Germany', emoji: '🇩🇪' },
+    'munich': { country: 'Germany', code: 'DE' },
     'zurich': { country: 'Switzerland', code: 'CH' },
     'stockholm': { country: 'Sweden', code: 'SE' },
     'oslo': { country: 'Norway', code: 'NO' },
@@ -609,8 +609,7 @@ const prefillData = {
     trip_type: 'roundtrip',
     dates: '',
     route: '',
-    baggage_allowance: '',
-    created_at: null
+    baggage_allowance: ''
 }
 
 async function initializeForm() {
@@ -766,8 +765,7 @@ async function initializeForm() {
                 trip_type: formData.get('trip_type'),
                 dates: formData.get('dates'),
                 route: formData.get('route'),
-                baggage_allowance: formData.get('baggage_allowance'),
-                created_at: formData.get('created_at') || null // Will use Supabase default if null
+                baggage_allowance: formData.get('baggage_allowance')
             }
 
             let error;
@@ -906,11 +904,6 @@ document.querySelector('#app').innerHTML = `
         <div class="form-group">
           <label for="baggage_allowance">Baggage Allowance:</label>
           <input type="text" id="baggage_allowance" name="baggage_allowance" required placeholder="e.g., 23kg checked bag">
-        </div>
-
-        <div class="form-group">
-          <label for="created_at">Created At (optional):</label>
-          <input type="datetime-local" id="created_at" name="created_at" step="1">
         </div>
 
         <div class="form-group checkbox-group">
@@ -1305,11 +1298,6 @@ const formHtml = `
             <input type="text" id="baggage_allowance" name="baggage_allowance" required placeholder="e.g., 23kg checked bag">
         </div>
 
-        <div class="form-group">
-          <label for="created_at">Created At (optional):</label>
-          <input type="datetime-local" id="created_at" name="created_at" step="1">
-        </div>
-
         <div class="form-group checkbox-group">
             <label>
                 <input type="checkbox" id="is_hot" name="is_hot">
@@ -1483,12 +1471,5 @@ function prefillForm(data = prefillData) {
     const submitButton = form.querySelector('button[type="submit"]')
     if (submitButton) {
         submitButton.textContent = isEditing ? 'Update Deal' : 'Add Deal'
-    }
-
-    if (data.created_at) {
-        const date = new Date(data.created_at)
-        form.querySelector('#created_at').value = date.toISOString().slice(0, 19)
-    } else {
-        form.querySelector('#created_at').value = ''
     }
 }
