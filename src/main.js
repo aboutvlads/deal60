@@ -768,6 +768,12 @@ async function initializeForm() {
                 baggage_allowance: formData.get('baggage_allowance')
             }
 
+            // Add created_at if it was provided
+            const customCreatedAt = formData.get('created_at')
+            if (customCreatedAt) {
+                data.created_at = new Date(customCreatedAt).toISOString()
+            }
+
             let error;
             if (isEditing) {
                 ({ error } = await supabase
@@ -904,6 +910,11 @@ document.querySelector('#app').innerHTML = `
         <div class="form-group">
           <label for="baggage_allowance">Baggage Allowance:</label>
           <input type="text" id="baggage_allowance" name="baggage_allowance" required placeholder="e.g., 23kg checked bag">
+        </div>
+
+        <div class="form-group">
+          <label for="created_at">Created At: (Optional)</label>
+          <input type="datetime-local" id="created_at" name="created_at">
         </div>
 
         <div class="form-group checkbox-group">
@@ -1296,6 +1307,11 @@ const formHtml = `
         <div class="form-group">
             <label for="baggage_allowance">Baggage Allowance:</label>
             <input type="text" id="baggage_allowance" name="baggage_allowance" required placeholder="e.g., 23kg checked bag">
+        </div>
+
+        <div class="form-group">
+          <label for="created_at">Created At: (Optional)</label>
+          <input type="datetime-local" id="created_at" name="created_at">
         </div>
 
         <div class="form-group checkbox-group">
